@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Adarsh's Portfolio</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Elsie:wght@400;900&family=Playwrite+AU+QLD:wght@100..400&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+    <body>
+    <!-- Custom Glowing Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">Adarsh's Portfolio</div>
+
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="services.html">Services</a></li>
+           <li>
+    <a href="https://wa.me/919313506135?text=Hi%20Adarsh,%20I%20saw%20your%20portfolio%20and%20wanted%20to%20connect!" target="_blank" rel="noopener noreferrer">Contact</a>
+</li>
+        </ul>
+    </nav>
+
+    <main>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <!-- New Animated Layers -->
+            <div class="hero-bg"></div>
+            <div class="ambient-blue"></div>
+
+            <div class="hero-left">
+
+                <div class="one">
+                    Welcome to My World
+                </div>
+
+                <div class="two">
+                    I am a &lt;web developer&gt;
+                </div>
+
+                <!-- <div class="buttons">
+                    <button class="btn">Contact Me</button>
+                    <button class="btn">Services</button>
+                </div> -->
+
+            </div>
+
+            <div class="hero-right">
+                <a href="https://www.linkedin.com/in/adarsh-kumar-1741273b2" target="_blank" rel="noopener noreferrer">
+                    <img src="Adarsh.png" alt="Adarsh">
+                </a>
+            </div>
+
+        </section>
+
+        <!-- Seamless Infinite Horizontal Projects Section -->
+        <section class="Projects-Wrapper">
+            <div class="Projects-Track">
+
+                <!-- Project 1 -->
+                <div class="Project">
+                    <div class="Project_image">
+                        <img src="img1.jpeg" alt="Jerry">
+                    </div>
+                    <div class="Project_info">
+                        <div class="Text">Jerry</div>
+                        <p>
+                            Jerry is a tiny, smug brown mouse who treats an entire
+                            household like his personal playground and a hapless
+                            cat named Tom as his full-time unpaid stunt double.
+                        </p>
+                        <div class="buttons">
+                            <button class="btn">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="Project">
+                    <div class="Project_image">
+                        <img src="Tom.png" alt="Tom">
+                    </div>
+                    <div class="Project_info">
+                        <div class="Text">Tom</div>
+                        <p>
+                            Tom is a blue-grey house cat who doubles as a
+                            masterclass in physics-defying slapstick and
+                            professional failure.
+                        </p>
+                        <div class="buttons">
+                            <button class="btn">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 (With image containment class) -->
+                <div class="Project">
+                    <div class="Project_image">
+                        <img src="Muscle mouse.png" alt="Muscle Mouse" class="fit-contain">
+                    </div>
+                    <div class="Project_info">
+                        <div class="Text">Muscle Mouse</div>
+                        <p>
+                            Muscles Mouse is Jerry Mouse's super-strong,
+                            street-smart cousin. Known for his incredible
+                            physical strength, he easily overpowers Tom and
+                            local alley cats.
+                        </p>
+                        <div class="buttons">
+                            <button class="btn">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 4 (With image containment class) -->
+                <div class="Project">
+                    <div class="Project_image">
+                        <img src="shin.jpg" alt="Shinchan" class="fit-contain">
+                    </div>
+                    <div class="Project_info">
+                        <div class="Text">Shinchan</div>
+                        <p>
+                            Shin-chan is a mischievous five-year-old boy who drives his parents crazy with his cheeky attitude, bizarre antics, and zero adult filter. 
+                        </p>
+                        <div class="buttons">
+                            <button class="btn">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- Project 5 (With image containment class) -->
+                <div class="Project">
+                    <div class="Project_image">
+                        <img src="Doraemon.png" alt="Doraemon" class="fit-contain">
+                    </div>
+                    <div class="Project_info">
+                        <div class="Text">Doraemon</div>
+                        <p>
+                            Doraemon is a round, earless blue robot cat from the 22nd century who panics like a stressed-out parent whenever his lazy friend Nobita cries for help.
+                        </p>
+                        <div class="buttons">
+                            <button class="btn">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+<!-- Project 6: Embedded Live Todo App -->
+<div class="Project todo-project" style="height: auto; min-height: 560px;">
+    <div class="Project_image" style="height: 380px; min-height: 380px; max-height: 380px; overflow: hidden; background: #fff; padding: 0;">
+        <iframe 
+            src="/todo" 
+            title="Todo App" 
+            style="width: 100%; height: 100%; border: none; overflow: auto; display: block;"
+            loading="lazy">
+        </iframe>
+    </div>
+    <div class="Project_info">
+        <div class="Text">Task Tracker</div>
+        <p>
+            Interactive live Todo List app running directly in this card. Features filtering, active counters, and LocalStorage.
+        </p>
+        <div class="buttons">
+            <a href="/todo" class="btn" target="_blank" style="text-decoration: none; display: inline-block;">
+                Full Screen
+            </a>
+        </div>
+    </div>
+</div>         </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        Copyright 2029<br>
+        All rights reserved
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
