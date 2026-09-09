@@ -9,3 +9,28 @@
 @media(max-width:760px){.todo-header{align-items:flex-start;flex-direction:column}.stats{width:100%}.stats div{flex:1}.composer{grid-template-columns:1fr 1fr}.composer input:first-of-type{grid-column:1/-1}.add-button{min-height:46px}.controls{grid-template-columns:1fr}.filters{justify-content:stretch}.filters button{flex:1}.sort-control{justify-content:space-between}}
 @media(max-width:520px){.todo-wrap{width:min(100% - 20px,900px);padding-top:18px}.todo-app{border-radius:20px}.todo-header{padding:24px 18px}.stats div{min-width:0;padding:10px}.composer{grid-template-columns:1fr;padding:14px}.composer input:first-of-type{grid-column:auto}.controls{padding:12px 14px}.bulk-actions{justify-content:stretch;padding:10px 14px}.bulk-actions button{flex:1}.todo-item{grid-template-columns:30px minmax(0,1fr) auto;gap:9px;padding:14px}.delete{grid-column:3;grid-row:1}.item-action.edit{grid-column:2;justify-self:start;padding:5px 8px;margin-top:3px}.inline-editor{grid-template-columns:1fr 1fr}.inline-editor input:first-child{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+
+/* Todo polish: clearer task rows, drag affordance and mobile-safe controls. */
+.todo-item{grid-template-columns:18px 34px minmax(0,1fr) auto auto;min-height:64px}
+.drag-handle{display:grid;place-items:center;color:#5f6571;font-size:.8rem;letter-spacing:-.18em;cursor:grab;user-select:none}
+.todo-item:active .drag-handle{cursor:grabbing}
+.todo-item.dragging{opacity:.45}
+.todo-item.drag-over{box-shadow:inset 0 2px 0 var(--accent)}
+.todo-item .task-title{transition:color .25s ease}
+.todo-item.done .task-title{color:#727783}
+.preview-overlay{position:absolute;inset:0;z-index:2;display:block}
+.todo-media iframe{z-index:1}
+.todo-media .media-arrow{z-index:4}
+.footer-socials,.contact-socials{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.contact-socials{margin-top:18px}
+.contact-socials .button{min-height:44px}
+@media(max-width:520px){
+  .todo-item{grid-template-columns:14px 30px minmax(0,1fr) auto;gap:8px}
+  .todo-item .delete{grid-column:4;grid-row:1}
+  .todo-item .item-action.edit{grid-column:3;grid-row:2}
+  .todo-item .drag-handle{font-size:.7rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .todo-item .task-title{transition:none}
+}
