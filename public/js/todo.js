@@ -1,205 +1,124 @@
 (() => {
-  "use strict";
+"use strict";
 
-  const KEY = "adarsh-todos";
-  const LEGACY_KEYS = ["todos", "todoList", "todo-items"];
-  const $ = id => document.getElementById(id);
-  const form = $("todoForm"), input = $("todoInput"), list = $("todoList");
-  if (!form || !input || !list) return;
+const STORE="adarsh-todos-v2";
+const LEGACY=["adarsh-todos","todos","todoList","todo-items"];
+const $=id=>document.getElementById(id);
+const form=$("todoForm"), input=$("todoInput"), list=$("todoList");
+if(!form||!input||!list) return;
 
-  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let filter = "all", query = "", sort = "created";
-  let tasks = load();
+const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let tasks=load(), filter="all", query="", sort="created";
 
-  function id() {
-    return crypto.randomUUID?.() || "todo-" + Date.now().toString(36) + Math.random().toString(36).slice(2);
-  }
-
-  function normalize(item, index) {
-    if (!item || typeof item !== "object") return null;
-    const title = typeof item.title === "string" ? item.title.trim().slice(0, 240) : "";
-    if (!title) return null;
-    const createdAt = Number(item.createdAt) || Date.now() + index;
-    return {
-      id: String(item.id || id()), title,
-      completed: Boolean(item.completed ?? item.done),
-      priority: ["low","normal","high"].includes(item.priority) ? item.priority : "normal",
-      category: typeof item.category === "string" ? item.category.trim().slice(0,32) : "",
-      dueDate: typeof item.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.dueDate) ? item.dueDate : "",
-      createdAt, updatedAt: Number(item.updatedAt) || createdAt,
-      order: Number.isFinite(Number(item.order)) ? Number(item.order) : index
-    };
-  }
-
-  function parse(raw) {
-    try {
-      const data = JSON.parse(raw);
-      const source = Array.isArray(data) ? data : Array.isArray(data?.todos) ? data.todos : [];
-      return source.map(normalize).filter(Boolean);
-    } catch { return null; }
-  }
-
-  function load() {
-    try {
-      const current = localStorage.getItem(KEY);
-      if (current !== null) return parse(current) || [];
-      for (const legacyKey of LEGACY_KEYS) {
-        const raw = localStorage.getItem(legacyKey);
-        if (raw === null) continue;
-        const migrated = parse(raw);
-        if (migrated) {
-          localStorage.setItem(KEY, JSON.stringify(migrated));
-          return migrated;
-        }
-      }
-    } catch {}
-    return [];
-  }
-
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(tasks)); } catch {}
-  }
-
-  function priorityRank(p) { return p === "high" ? 0 : p === "normal" ? 1 : 2; }
-
-  function visible() {
-    const q = query.trim().toLowerCase();
-    return tasks.filter(t => {
-      const f = filter === "all" || (filter === "active" && !t.completed) || (filter === "completed" && t.completed);
-      const s = !q || [t.title,t.category,t.priority].some(v => v.toLowerCase().includes(q));
-      return f && s;
-    }).sort((a,b) => {
-      if (sort === "oldest") return a.createdAt - b.createdAt;
-      if (sort === "priority") return priorityRank(a.priority) - priorityRank(b.priority) || b.createdAt - a.createdAt;
-      if (sort === "due") return (a.dueDate || "9999-99-99").localeCompare(b.dueDate || "9999-99-99") || b.createdAt - a.createdAt;
-      if (sort === "alphabetical") return a.title.localeCompare(b.title);
-      return b.createdAt - a.createdAt;
-    });
-  }
-
-  function overdue(t) { return t.dueDate && !t.completed && t.dueDate < new Date().toISOString().slice(0,10); }
-  function dueText(value) {
-    if (!value) return "";
-    const d = new Date(value + "T00:00:00");
-    return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
-  }
-
-  function makeMeta(t) {
-    const meta = document.createElement("div");
-    meta.className = "task-meta";
-    if (t.priority !== "normal") {
-      const p = document.createElement("span");
-      p.className = "priority " + t.priority; p.textContent = t.priority; meta.append(p);
+function uid(){return globalThis.crypto?.randomUUID?.()||"todo-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,9)}
+function cleanDate(v){return typeof v==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v)?v:""}
+function normalize(raw,index=0){
+  if(!raw||typeof raw!=="object") return null;
+  const title=typeof raw.title==="string"?raw.title.trim().slice(0,240):typeof raw.text==="string"?raw.text.trim().slice(0,240):"";
+  if(!title) return null;
+  const created=Number(raw.createdAt)||Date.now()+index;
+  return {
+    id:String(raw.id||uid()), title, completed:Boolean(raw.completed??raw.done),
+    priority:["low","normal","high"].includes(raw.priority)?raw.priority:"normal",
+    category:typeof raw.category==="string"?raw.category.trim().slice(0,32):"",
+    dueDate:cleanDate(raw.dueDate), createdAt:created, updatedAt:Number(raw.updatedAt)||created,
+    order:Number.isFinite(Number(raw.order))?Number(raw.order):index
+  };
+}
+function parse(raw){
+  try{
+    const value=JSON.parse(raw);
+    const source=Array.isArray(value)?value:Array.isArray(value?.todos)?value.todos:[];
+    return source.map(normalize).filter(Boolean);
+  }catch{return null}
+}
+function load(){
+  try{
+    const current=localStorage.getItem(STORE);
+    if(current!==null) return parse(current)||[];
+    for(const key of LEGACY){
+      const raw=localStorage.getItem(key); if(raw===null) continue;
+      const migrated=parse(raw); if(migrated){localStorage.setItem(STORE,JSON.stringify(migrated));return migrated}
     }
-    if (t.category) {
-      const c = document.createElement("span"); c.textContent = t.category; meta.append(c);
-    }
-    if (t.dueDate) {
-      const d = document.createElement("span");
-      d.className = overdue(t) ? "due overdue" : "due";
-      d.textContent = (overdue(t) ? "Overdue · " : "Due · ") + dueText(t.dueDate); meta.append(d);
-    }
-    return meta;
-  }
-
-  function editTask(li,t) {
-    if (li.classList.contains("editing")) return;
-    li.classList.add("editing");
-    const editor = document.createElement("form");
-    editor.className = "inline-editor";
-    const title = Object.assign(document.createElement("input"),{value:t.title,maxLength:240});
-    title.setAttribute("aria-label","Task title");
-    const priority = document.createElement("select");
-    ["low","normal","high"].forEach(v => {
-      const o = new Option(v[0].toUpperCase()+v.slice(1),v); o.selected = v === t.priority; priority.add(o);
-    });
-    const category = Object.assign(document.createElement("input"),{value:t.category,maxLength:32,placeholder:"Category"});
-    category.setAttribute("aria-label","Category");
-    const due = Object.assign(document.createElement("input"),{type:"date",value:t.dueDate});
-    due.setAttribute("aria-label","Due date");
-    const saveBtn = Object.assign(document.createElement("button"),{type:"submit",textContent:"Save"});
-    const cancel = Object.assign(document.createElement("button"),{type:"button",textContent:"Cancel"});
-    editor.append(title,priority,category,due,saveBtn,cancel);
-    const body = li.querySelector(".task-body"); body.replaceChildren(editor);
-    editor.addEventListener("submit",e => {
-      e.preventDefault();
-      const value = title.value.trim();
-      if (!value) { title.focus(); return; }
-      Object.assign(t,{title:value.slice(0,240),priority:priority.value,category:category.value.trim().slice(0,32),dueDate:due.value,updatedAt:Date.now()});
-      save(); render();
-    });
-    cancel.addEventListener("click",render);
-    title.addEventListener("keydown",e => { if(e.key==="Escape") render(); });
-    title.focus(); title.select();
-  }
-
-  function item(t) {
-    const li = document.createElement("li");
-    li.className = "todo-item" + (t.completed ? " done" : "");
-    li.dataset.id = t.id;
-
-    const check = Object.assign(document.createElement("button"),{type:"button",className:"check",textContent:t.completed?"✓":""});
-    check.setAttribute("aria-label",t.completed ? "Mark task active" : "Complete task");
-    const body = document.createElement("div"); body.className="task-body";
-    const title = document.createElement("span"); title.className="task-title"; title.textContent=t.title;
-    body.append(title,makeMeta(t));
-
-    const edit = Object.assign(document.createElement("button"),{type:"button",className:"item-action edit",textContent:"Edit"});
-    const del = Object.assign(document.createElement("button"),{type:"button",className:"item-action delete",textContent:"×"});
-    edit.setAttribute("aria-label","Edit task"); del.setAttribute("aria-label","Delete task");
-
-    check.addEventListener("click",()=>{t.completed=!t.completed;t.updatedAt=Date.now();save();render();});
-    edit.addEventListener("click",()=>editTask(li,t));
-    del.addEventListener("click",()=>{
-      const remove=()=>{tasks=tasks.filter(x=>x.id!==t.id);save();render();};
-      if(reduceMotion) remove(); else {li.classList.add("removing");setTimeout(remove,180);}
-    });
-    li.append(check,body,edit,del);
-    return li;
-  }
-
-  function render() {
-    const shown = visible();
-    list.replaceChildren(...shown.map(item));
-    const empty=$("emptyState"); if(empty) {
-      empty.hidden=shown.length>0;
-      const strong=empty.querySelector("strong");
-      if(strong) strong.textContent=query||filter!=="all"?"No matching tasks":"No tasks here";
-    }
-    const done=tasks.filter(t=>t.completed).length;
-    $("totalCount").textContent=tasks.length;
-    $("activeCount").textContent=tasks.length-done;
-    $("completedCount").textContent=done;
-    $("markAll").disabled=!tasks.length || done===tasks.length;
-    $("clearCompleted").disabled=!done;
-  }
-
-  form.addEventListener("submit",e=>{
-    e.preventDefault();
-    const title=input.value.trim();
-    if(!title){input.focus();return;}
-    const now=Date.now();
-    tasks.push({
-      id:id(),title:title.slice(0,240),completed:false,
-      priority:$("priorityInput")?.value||"normal",
-      category:$("categoryInput")?.value.trim().slice(0,32)||"",
-      dueDate:$("dueDateInput")?.value||"",createdAt:now,updatedAt:now,order:tasks.length
-    });
-    save(); input.value=""; $("categoryInput").value=""; $("dueDateInput").value=""; $("priorityInput").value="normal"; render(); input.focus();
-  });
-
-  document.querySelectorAll(".filters button").forEach(btn=>btn.addEventListener("click",()=>{
-    document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active"); document.querySelectorAll(".filters button").forEach(b=>b.setAttribute("aria-pressed",String(b===btn))); filter=btn.dataset.filter||"all"; render();
-  }));
-  $("searchInput")?.addEventListener("input",e=>{query=e.target.value;render();});
-  $("sortSelect")?.addEventListener("change",e=>{sort=e.target.value;render();});
-  $("markAll")?.addEventListener("click",()=>{tasks.forEach(t=>{t.completed=true;t.updatedAt=Date.now();});save();render();});
-  $("clearCompleted")?.addEventListener("click",()=>{tasks=tasks.filter(t=>!t.completed);save();render();});
-  addEventListener("storage",e=>{if(e.key===KEY){const incoming=parse(e.newValue||"[]");if(incoming){tasks=incoming;render();}}});
-  addEventListener("keydown",e=>{
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();$("searchInput")?.focus();}
-    if(e.key==="/" && document.activeElement?.tagName!=="INPUT"){e.preventDefault();$("searchInput")?.focus();}
-  });
-  render();
+  }catch{}
+  return []
+}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(tasks))}catch{}}
+function rank(p){return p==="high"?0:p==="normal"?1:2}
+function shown(){
+  const q=query.trim().toLowerCase();
+  return tasks.filter(t=>{
+    const okFilter=filter==="all"||(filter==="active"&&!t.completed)||(filter==="completed"&&t.completed);
+    const hay=[t.title,t.category,t.priority].join(" ").toLowerCase();
+    return okFilter&&(!q||hay.includes(q));
+  }).sort((a,b)=>{
+    if(sort==="oldest") return a.createdAt-b.createdAt;
+    if(sort==="priority") return rank(a.priority)-rank(b.priority)||b.createdAt-a.createdAt;
+    if(sort==="due") return (a.dueDate||"9999-12-31").localeCompare(b.dueDate||"9999-12-31")||b.createdAt-a.createdAt;
+    if(sort==="alphabetical") return a.title.localeCompare(b.title);
+    return b.createdAt-a.createdAt;
+  })
+}
+function dueLabel(v){
+  if(!v) return "";
+  const d=new Date(v+"T00:00:00");
+  return Number.isNaN(d.getTime())?"":d.toLocaleDateString(undefined,{month:"short",day:"numeric"})
+}
+function isOverdue(t){return !!t.dueDate&&!t.completed&&t.dueDate<new Date().toISOString().slice(0,10)}
+function meta(t){
+  const box=document.createElement("div");box.className="meta";
+  if(t.priority!=="normal"){const x=document.createElement("span");x.className="priority "+t.priority;x.textContent=t.priority;box.append(x)}
+  if(t.category){const x=document.createElement("span");x.textContent=t.category;box.append(x)}
+  if(t.dueDate){const x=document.createElement("span");x.className=isOverdue(t)?"due overdue":"due";x.textContent=(isOverdue(t)?"Overdue · ":"Due · ")+dueLabel(t.dueDate);box.append(x)}
+  return box
+}
+function edit(li,t){
+  if(li.classList.contains("editing"))return;
+  li.classList.add("editing");
+  const f=document.createElement("form");f.className="editor";
+  const title=Object.assign(document.createElement("input"),{value:t.title,maxLength:240});title.setAttribute("aria-label","Task title");
+  const p=document.createElement("select");["low","normal","high"].forEach(v=>{const o=new Option(v[0].toUpperCase()+v.slice(1),v);o.selected=v===t.priority;p.add(o)});
+  const c=Object.assign(document.createElement("input"),{value:t.category,maxLength:32,placeholder:"Category"});c.setAttribute("aria-label","Category");
+  const d=Object.assign(document.createElement("input"),{type:"date",value:t.dueDate});d.setAttribute("aria-label","Due date");
+  const s=Object.assign(document.createElement("button"),{type:"submit",textContent:"Save"});
+  const cancel=Object.assign(document.createElement("button"),{type:"button",textContent:"Cancel"});
+  f.append(title,p,c,d,s,cancel);li.querySelector(".body").replaceChildren(f);
+  f.addEventListener("submit",e=>{e.preventDefault();const v=title.value.trim();if(!v){title.focus();return}Object.assign(t,{title:v.slice(0,240),priority:p.value,category:c.value.trim().slice(0,32),dueDate:d.value,updatedAt:Date.now()});save();render()});
+  cancel.addEventListener("click",render);title.addEventListener("keydown",e=>{if(e.key==="Escape")render()});title.focus();title.select()
+}
+function row(t){
+  const li=document.createElement("li");li.className="task"+(t.completed?" done":"");li.dataset.id=t.id;
+  const check=Object.assign(document.createElement("button"),{type:"button",className:"check",textContent:t.completed?"✓":""});check.setAttribute("aria-label",t.completed?"Mark task active":"Complete task");
+  const body=document.createElement("div");body.className="body";
+  const title=document.createElement("span");title.className="title";title.textContent=t.title;body.append(title,meta(t));
+  const editBtn=Object.assign(document.createElement("button"),{type:"button",className:"action",textContent:"Edit"});editBtn.setAttribute("aria-label","Edit task");
+  const del=Object.assign(document.createElement("button"),{type:"button",className:"action delete",textContent:"×"});del.setAttribute("aria-label","Delete task");
+  check.addEventListener("click",()=>{t.completed=!t.completed;t.updatedAt=Date.now();save();render()});
+  editBtn.addEventListener("click",()=>edit(li,t));
+  del.addEventListener("click",()=>{const remove=()=>{tasks=tasks.filter(x=>x.id!==t.id);save();render()};if(reduce)remove();else{li.classList.add("removing");setTimeout(remove,180)}});
+  li.append(check,body,editBtn,del);return li
+}
+function render(){
+  const rows=shown();list.replaceChildren(...rows.map(row));
+  const empty=$("emptyState");empty.hidden=rows.length>0;
+  const heading=empty.querySelector("strong");heading.textContent=query||filter!=="all"?"No matching tasks":"No tasks here";
+  const done=tasks.filter(t=>t.completed).length;
+  $("totalCount").textContent=tasks.length;$("activeCount").textContent=tasks.length-done;$("completedCount").textContent=done;
+  $("markAll").disabled=!tasks.length||done===tasks.length;$("clearCompleted").disabled=!done;
+}
+form.addEventListener("submit",e=>{
+  e.preventDefault();const title=input.value.trim();if(!title){input.focus();return}
+  const now=Date.now();tasks.push({id:uid(),title:title.slice(0,240),completed:false,priority:$("priorityInput").value,category:$("categoryInput").value.trim().slice(0,32),dueDate:$("dueDateInput").value,createdAt:now,updatedAt:now,order:tasks.length});
+  save();form.reset();$("priorityInput").value="normal";render();input.focus()
+});
+document.querySelectorAll("[data-filter]").forEach(btn=>btn.addEventListener("click",()=>{
+  filter=btn.dataset.filter;document.querySelectorAll("[data-filter]").forEach(b=>{const active=b===btn;b.classList.toggle("active",active);b.setAttribute("aria-pressed",String(active))});render()
+}));
+$("searchInput").addEventListener("input",e=>{query=e.target.value;render()});
+$("sortSelect").addEventListener("change",e=>{sort=e.target.value;render()});
+$("markAll").addEventListener("click",()=>{tasks.forEach(t=>{t.completed=true;t.updatedAt=Date.now()});save();render()});
+$("clearCompleted").addEventListener("click",()=>{tasks=tasks.filter(t=>!t.completed);save();render()});
+addEventListener("storage",e=>{if(e.key===STORE){const next=parse(e.newValue||"[]");if(next){tasks=next;render()}}});
+addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();$("searchInput").focus()}if(e.key==="/"&&!["INPUT","SELECT","TEXTAREA"].includes(document.activeElement?.tagName)){e.preventDefault();$("searchInput").focus()}});
+render();
 })();
