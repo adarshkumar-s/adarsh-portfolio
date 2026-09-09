@@ -19,14 +19,14 @@
       const icon = document.createElement("link");
       icon.rel = "icon";
       icon.type = "image/svg+xml";
-      icon.href = "/assets/adarsh-a.svg";
+      icon.href = "/assets/adarsh-a-favicon.svg";
       icon.dataset.adarshBrand = "true";
       head.appendChild(icon);
     }
     if (!head.querySelector('link[rel="apple-touch-icon"][data-adarsh-brand]')) {
       const touchIcon = document.createElement("link");
       touchIcon.rel = "apple-touch-icon";
-      touchIcon.href = "/assets/adarsh-a.svg";
+      touchIcon.href = "/assets/adarsh-a-favicon.svg";
       touchIcon.dataset.adarshBrand = "true";
       head.appendChild(touchIcon);
     }
