@@ -55,6 +55,20 @@
     navHost.replaceChildren(header);
   }
 
+  /* ---------- visual navbar state on scroll ---------- */
+  const siteHeader = document.querySelector(".site-header");
+  if (siteHeader && !reduceMotion) {
+    let scrollFrame = 0;
+    const updateHeader = () => {
+      scrollFrame = 0;
+      siteHeader.classList.toggle("is-scrolled", window.scrollY > 18);
+    };
+    window.addEventListener("scroll", () => {
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(updateHeader);
+    }, { passive: true });
+    updateHeader();
+  }
+
   /* ---------- shared footer ---------- */
   const footerHost = document.getElementById("site-footer");
   if (footerHost) {
