@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d0d18" />
+      <stop offset="50%" stop-color="#141426" />
+      <stop offset="100%" stop-color="#080811" />
+    </linearGradient>
+
+    <!-- Header / Brand Gradient -->
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3055cf" />
+      <stop offset="50%" stop-color="#b432b6" />
+      <stop offset="100%" stop-color="#5d7cff" />
+    </linearGradient>
+
+    <!-- Task Checkbox Gradient -->
+    <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffcc" />
+      <stop offset="100%" stop-color="#3055cf" />
+    </linearGradient>
+
+    <!-- Card Glow Filter -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#b432b6" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 20px; font-weight: 800; fill: #ffffff; }
+    .subtitle { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; fill: #8b8ba7; }
+    .task-text { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 500; fill: #e1e1ec; }
+    .task-done { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; fill: #5f5f7a; text-decoration: line-through; }
+    .badge-text { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10px; font-weight: 700; fill: #ffffff; }
+    .chip-text { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10px; fill: #a5a5c5; }
+    .chip-active-text { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10px; font-weight: bold; fill: #ffffff; }
+  </style>
+
+  <!-- Canvas Background -->
+  <rect width="600" height="400" rx="16" fill="url(#bgGrad)" />
+
+  <!-- Subtle Grid Pattern Accent -->
+  <g opacity="0.08" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="80" x2="600" y2="80" />
+    <line x1="0" y1="160" x2="600" y2="160" />
+    <line x1="0" y1="240" x2="600" y2="240" />
+    <line x1="0" y1="320" x2="600" y2="320" />
+    <line x1="120" y1="0" x2="120" y2="400" />
+    <line x1="240" y1="0" x2="240" y2="400" />
+    <line x1="360" y1="0" x2="360" y2="400" />
+    <line x1="480" y1="0" x2="480" y2="400" />
+  </g>
+
+  <!-- Ambient Glow Blobs behind card -->
+  <circle cx="150" cy="120" r="90" fill="#3055cf" opacity="0.18" filter="blur(40px)" />
+  <circle cx="450" cy="280" r="100" fill="#b432b6" opacity="0.18" filter="blur(40px)" />
+
+  <!-- Main Todo Card Container -->
+  <g filter="url(#cardShadow)">
+    <rect x="75" y="45" width="450" height="310" rx="14" fill="#151520" stroke="#2a2a3e" stroke-width="1.5" />
+  </g>
+
+  <!-- Card Top Header Bar -->
+  <rect x="75" y="45" width="450" height="65" rx="14" fill="#1b1b2a" />
+  <rect x="75" y="95" width="450" height="15" fill="#1b1b2a" />
+  
+  <text x="100" y="78" class="title">My Task Flow</text>
+  <text x="100" y="96" class="subtitle">Vanilla JavaScript • LocalStorage Enabled</text>
+
+  <!-- Live Status Badge -->
+  <rect x="420" y="66" width="80" height="22" rx="11" fill="url(#primaryGrad)" />
+  <circle cx="432" cy="77" r="3.5" fill="#00ffcc" />
+  <text x="442" y="81" class="badge-text">v1.0 Live</text>
+
+  <!-- Filter Buttons Row -->
+  <rect x="100" y="122" width="42" height="22" rx="6" fill="#242438" stroke="#3d3d5c" stroke-width="1" />
+  <text x="112" y="137" class="chip-active-text">All</text>
+
+  <rect x="150" y="122" width="55" height="22" rx="6" fill="#191928" />
+  <text x="162" y="137" class="chip-text">Active</text>
+
+  <rect x="213" y="122" width="75" height="22" rx="6" fill="#191928" />
+  <text x="223" y="137" class="chip-text">Completed</text>
+
+  <!-- Task Item 1 (Active) -->
+  <g transform="translate(100, 160)">
+    <rect width="400" height="42" rx="8" fill="#1a1a2b" stroke="#282840" stroke-width="1" />
+    <rect x="14" y="13" width="16" height="16" rx="4" fill="#10101c" stroke="#5d7cff" stroke-width="1.8" />
+    <text x="42" y="26" class="task-text">Design interactive hero motion layout</text>
+    <circle cx="375" cy="21" r="9" fill="#242438" />
+    <text x="371" y="25" fill="#7a7a9e" font-family="sans-serif" font-size="12">×</text>
+  </g>
+
+  <!-- Task Item 2 (Completed) -->
+  <g transform="translate(100, 212)">
+    <rect width="400" height="42" rx="8" fill="#13131e" opacity="0.85" />
+    <rect x="14" y="13" width="16" height="16" rx="4" fill="url(#checkGrad)" />
+    <!-- Checkmark icon -->
+    <path d="M18 21 L21 24 L26 17" fill="none" stroke="#0d0d18" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="42" y="26" class="task-done">Connect Express.js local static routing</text>
+    <circle cx="375" cy="21" r="9" fill="#1c1c2b" />
+    <text x="371" y="25" fill="#4d4d68" font-family="sans-serif" font-size="12">×</text>
+  </g>
+
+  <!-- Task Item 3 (Active) -->
+  <g transform="translate(100, 264)">
+    <rect width="400" height="42" rx="8" fill="#1a1a2b" stroke="#282840" stroke-width="1" />
+    <rect x="14" y="13" width="16" height="16" rx="4" fill="#10101c" stroke="#b432b6" stroke-width="1.8" />
+    <text x="42" y="26" class="task-text">Deploy custom glowing cursor styles</text>
+    <circle cx="375" cy="21" r="9" fill="#242438" />
+    <text x="371" y="25" fill="#7a7a9e" font-family="sans-serif" font-size="12">×</text>
+  </g>
+
+  <!-- Card Footer Bar -->
+  <line x1="75" y1="318" x2="525" y2="318" stroke="#222235" stroke-width="1" />
+  <text x="100" y="338" class="subtitle">2 items remaining</text>
+  <text x="430" y="338" font-family="'Segoe UI', sans-serif" font-size="11" fill="#b432b6">Clear Done</text>
+</svg>
