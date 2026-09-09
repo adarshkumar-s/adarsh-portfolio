@@ -1674,3 +1674,81 @@ body::after{
 .todo-thumb .preview-badge{position:absolute;right:16px;bottom:15px;z-index:4;padding:6px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(5,6,8,.72);color:#f0d49b;font:800 .52rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;backdrop-filter:blur(10px)}
 .todo-thumb:hover .preview-badge{border-color:rgba(228,194,127,.38)}
 @media(max-width:800px){.todo-thumb{min-height:270px}.todo-thumb iframe{min-height:270px}}
+
+
+/* ---------- hero quote + footer social actions ---------- */
+.hero-quote{
+  max-width:760px;
+  margin:18px 0 30px;
+  font-size:clamp(3.35rem,6.4vw,7.1rem);
+  line-height:.9;
+  letter-spacing:-.075em;
+  text-wrap:balance;
+}
+.hero-quote em{
+  display:block;
+  margin-top:.08em;
+  color:var(--text);
+  font-style:italic;
+}
+.footer-bottom{
+  align-items:center;
+  flex-wrap:wrap;
+}
+.footer-socials{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-left:auto;
+}
+.social-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:9px 15px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:999px;
+  background:rgba(255,255,255,.035);
+  color:#d7d7dc!important;
+  font-size:.7rem!important;
+  font-weight:800;
+  letter-spacing:.02em;
+  transition:transform var(--mid) var(--ease),background var(--mid),border-color var(--mid),box-shadow var(--mid),color var(--mid);
+}
+.social-button:hover,
+.social-button:focus-visible{
+  color:#fff!important;
+  transform:translateY(-3px);
+  background:rgba(167,139,250,.11);
+  border-color:rgba(167,139,250,.34);
+  box-shadow:0 12px 32px rgba(0,0,0,.22);
+}
+@media(max-width:800px){
+  .hero-quote{
+    max-width:680px;
+    font-size:clamp(3rem,11vw,5.4rem);
+    line-height:.91;
+    margin-bottom:25px;
+  }
+  .footer-socials{
+    width:100%;
+    margin-left:0;
+    justify-content:flex-start;
+  }
+}
+@media(max-width:430px){
+  .hero-quote{
+    font-size:clamp(2.65rem,12.5vw,4rem);
+    letter-spacing:-.065em;
+  }
+  .social-button{
+    flex:1 1 auto;
+    min-width:92px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .social-button,.hero-quote{transition:none}
+}
