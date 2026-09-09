@@ -8,7 +8,7 @@
   ];
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const touchDevice = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const currentPath = location.pathname.replace(/\/$/, "") || "/";
 
   /* ---------- shared navigation ---------- */
@@ -23,7 +23,7 @@
     const brand = document.createElement("a");
     brand.className = "brand";
     brand.href = "/";
-    brand.textContent = "Adarsh";
+    brand.textContent = "Adarsh Kumar";
 
     const menu = document.createElement("button");
     menu.className = "menu";
@@ -148,7 +148,7 @@
   const noise = document.getElementById("a-noise");
   const rippleGroup = document.getElementById("a-ripples");
 
-  if (stage && svg && baseA && displacement && noise && rippleGroup && !reduceMotion && !touchDevice) {
+  if (stage && svg && baseA && displacement && noise && rippleGroup && !reduceMotion && finePointer) {
     const SVG_NS = "http://www.w3.org/2000/svg";
     const defs = svg.querySelector("defs");
 
@@ -326,7 +326,7 @@
   }
 
   /* ---------- subtle project-card tilt / local light ---------- */
-  if (!reduceMotion && !touchDevice) {
+  if (!reduceMotion && finePointer) {
     document.querySelectorAll(".tilt-card").forEach(card => {
       let frame = 0;
       let rx = 0;
@@ -370,7 +370,7 @@
     const cursor = document.createElement("div");
     cursor.className = "custom-cursor";
     cursor.setAttribute("aria-hidden", "true");
-    document.body.appendChild(cursor);
+    document.body.appendChild(cursor);\n    document.body.classList.add("has-custom-cursor");
 
     let targetX = -80;
     let targetY = -80;
