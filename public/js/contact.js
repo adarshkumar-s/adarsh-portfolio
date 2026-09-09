@@ -1,0 +1,1 @@
+const form=document.getElementById("contactForm");form?.addEventListener("submit",e=>{e.preventDefault();if(!form.checkValidity()){form.reportValidity();return}const status=document.getElementById("formStatus");status.textContent="Validated locally. No message was sent because an email provider is not configured.";status.className="notice"});
