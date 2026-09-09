@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08090d">
+<title>Todo App — Adarsh Kumar</title>
+<link rel="stylesheet" href="/css/todo.css">
+</head>
+<body>
+<main class="todo-wrap">
+  <a class="back" href="/projects/todo-app">← Back to project</a>
+  <section class="todo-app" aria-labelledby="todo-title">
+    <header>
+      <span>TODO APP</span>
+      <h1 id="todo-title">My Todo List</h1>
+      <p>Stay organized and productive</p>
+    </header>
+    <form id="todoForm">
+      <label class="sr-only" for="todoInput">New task</label>
+      <input id="todoInput" type="text" maxlength="240" placeholder="Add a new task..." autocomplete="off">
+      <button type="submit">Add</button>
+    </form>
+    <div class="filters" role="group" aria-label="Filter tasks">
+      <button type="button" class="active" data-filter="all">All</button>
+      <button type="button" data-filter="active">Active</button>
+      <button type="button" data-filter="completed">Completed</button>
+    </div>
+    <ul id="todoList" aria-live="polite"></ul>
+    <footer>
+      <span id="itemsLeft">0 items left</span>
+      <button id="clearCompleted" type="button">Clear Completed</button>
+    </footer>
+  </section>
+</main>
+<script src="/js/todo.js" defer></script>
+</body>
+</html>
