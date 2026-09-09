@@ -366,7 +366,7 @@
   }
 
   /* ---------- desktop cursor with context-aware states ---------- */
-  if (!reduceMotion && !touchDevice) {
+  if (!reduceMotion && finePointer) {
     const cursor = document.createElement("div");
     cursor.className = "custom-cursor";
     cursor.setAttribute("aria-hidden", "true");
