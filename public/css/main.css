@@ -1752,3 +1752,16 @@ body::after{
 @media(prefers-reduced-motion:reduce){
   .social-button,.hero-quote{transition:none}
 }
+
+/* ---------- continuous project rail ---------- */
+[data-infinite-project-rail]{
+  width:max-content;
+  will-change:transform;
+  overflow:visible;
+}
+[data-infinite-project-rail] > .old-style-project{
+  flex-shrink:0;
+}
+@media(prefers-reduced-motion:reduce){
+  [data-infinite-project-rail]{transform:none!important}
+}
