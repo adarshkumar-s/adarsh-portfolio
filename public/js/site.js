@@ -405,6 +405,40 @@
     });
   }
 
+  /* ---------- seamless project rail: same continuous loop as the archived portfolio ---------- */
+  const projectRail = document.querySelector("[data-infinite-project-rail]");
+  if (projectRail && !reduceMotion && projectRail.children.length > 1) {
+    const originalCards = Array.from(projectRail.children);
+    const gap = parseFloat(getComputedStyle(projectRail).columnGap || getComputedStyle(projectRail).gap || "0") || 0;
+    originalCards.forEach(card => projectRail.appendChild(card.cloneNode(true)));
+
+    let loopWidth = 0;
+    let offset = 0;
+    let lastTime = performance.now();
+    let railFrame = 0;
+    const speed = 34;
+
+    const measureLoop = () => {
+      loopWidth = originalCards.reduce((total, card) => total + card.getBoundingClientRect().width, 0) + gap * Math.max(0, originalCards.length - 1);
+      if (loopWidth > 0) offset = ((offset % loopWidth) + loopWidth) % loopWidth;
+    };
+
+    const tick = now => {
+      const dt = Math.min(40, Math.max(8, now - lastTime));
+      lastTime = now;
+      if (loopWidth > 0) {
+        offset -= speed * (dt / 1000);
+        if (offset <= -loopWidth) offset += loopWidth;
+        projectRail.style.transform = "translate3d(" + offset.toFixed(2) + "px,0,0)";
+      }
+      railFrame = requestAnimationFrame(tick);
+    };
+
+    measureLoop();
+    window.addEventListener("resize", measureLoop, { passive: true });
+    railFrame = requestAnimationFrame(tick);
+  }
+  
   /* ---------- desktop cursor with context-aware states ---------- */
   if (!reduceMotion && finePointer) {
     const cursor = document.createElement("div");
