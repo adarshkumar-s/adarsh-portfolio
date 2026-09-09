@@ -1,439 +1,205 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "adarsh-todos";
-  const legacyKeys = ["todos", "todoList", "todo-items"];
+  const KEY = "adarsh-todos";
+  const LEGACY_KEYS = ["todos", "todoList", "todo-items"];
   const $ = id => document.getElementById(id);
-
-  const form = $("todoForm");
-  const input = $("todoInput");
-  const priorityInput = $("priorityInput");
-  const categoryInput = $("categoryInput");
-  const dueDateInput = $("dueDateInput");
-  const searchInput = $("searchInput");
-  const sortSelect = $("sortSelect");
-  const list = $("todoList");
-  const emptyState = $("emptyState");
-  const clearCompleted = $("clearCompleted");
-  const markAll = $("markAll");
-  const totalCount = $("totalCount");
-  const activeCount = $("activeCount");
-  const completedCount = $("completedCount");
-
+  const form = $("todoForm"), input = $("todoInput"), list = $("todoList");
   if (!form || !input || !list) return;
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let filter = "all";
-  let search = "";
-  let sort = "created";
-  let todos = loadTodos();
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let filter = "all", query = "", sort = "created";
+  let tasks = load();
 
-  function uid() {
-    return window.crypto?.randomUUID?.() ||
-      "todo-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+  function id() {
+    return crypto.randomUUID?.() || "todo-" + Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
 
-  function normalize(todo, index) {
-    if (!todo || typeof todo !== "object") return null;
-    const title = typeof todo.title === "string" ? todo.title.trim() : "";
+  function normalize(item, index) {
+    if (!item || typeof item !== "object") return null;
+    const title = typeof item.title === "string" ? item.title.trim().slice(0, 240) : "";
     if (!title) return null;
-
-    const createdAt = Number(todo.createdAt) || Date.now() + index;
-    const updatedAt = Number(todo.updatedAt) || createdAt;
+    const createdAt = Number(item.createdAt) || Date.now() + index;
     return {
-      id: String(todo.id || uid()),
-      title: title.slice(0, 240),
-      completed: Boolean(todo.completed ?? todo.done),
-      priority: ["low", "normal", "high"].includes(todo.priority) ? todo.priority : "normal",
-      category: typeof todo.category === "string" ? todo.category.trim().slice(0, 32) : "",
-      dueDate: typeof todo.dueDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(todo.dueDate) ? todo.dueDate : "",
-      createdAt,
-      updatedAt,
-      order: Number.isFinite(Number(todo.order)) ? Number(todo.order) : index
+      id: String(item.id || id()), title,
+      completed: Boolean(item.completed ?? item.done),
+      priority: ["low","normal","high"].includes(item.priority) ? item.priority : "normal",
+      category: typeof item.category === "string" ? item.category.trim().slice(0,32) : "",
+      dueDate: typeof item.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.dueDate) ? item.dueDate : "",
+      createdAt, updatedAt: Number(item.updatedAt) || createdAt,
+      order: Number.isFinite(Number(item.order)) ? Number(item.order) : index
     };
   }
 
-  function parseStored(raw) {
+  function parse(raw) {
     try {
-      const parsed = JSON.parse(raw);
-      const source = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.todos) ? parsed.todos : [];
+      const data = JSON.parse(raw);
+      const source = Array.isArray(data) ? data : Array.isArray(data?.todos) ? data.todos : [];
       return source.map(normalize).filter(Boolean);
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   }
 
-  function loadTodos() {
+  function load() {
     try {
-      const current = localStorage.getItem(STORAGE_KEY);
-      if (current !== null) return parseStored(current) || [];
-
-      for (const key of legacyKeys) {
-        const legacy = localStorage.getItem(key);
-        if (legacy === null) continue;
-        const migrated = parseStored(legacy);
-        if (migrated?.length) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+      const current = localStorage.getItem(KEY);
+      if (current !== null) return parse(current) || [];
+      for (const legacyKey of LEGACY_KEYS) {
+        const raw = localStorage.getItem(legacyKey);
+        if (raw === null) continue;
+        const migrated = parse(raw);
+        if (migrated) {
+          localStorage.setItem(KEY, JSON.stringify(migrated));
           return migrated;
         }
       }
-    } catch {
-      // Private/restricted storage should never prevent the app from opening.
-    }
+    } catch {}
     return [];
   }
 
   function save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-    } catch {
-      // The UI remains usable when storage is unavailable.
-    }
+    try { localStorage.setItem(KEY, JSON.stringify(tasks)); } catch {}
   }
 
-  function priorityRank(priority) {
-    return priority === "high" ? 0 : priority === "normal" ? 1 : 2;
+  function priorityRank(p) { return p === "high" ? 0 : p === "normal" ? 1 : 2; }
+
+  function visible() {
+    const q = query.trim().toLowerCase();
+    return tasks.filter(t => {
+      const f = filter === "all" || (filter === "active" && !t.completed) || (filter === "completed" && t.completed);
+      const s = !q || [t.title,t.category,t.priority].some(v => v.toLowerCase().includes(q));
+      return f && s;
+    }).sort((a,b) => {
+      if (sort === "oldest") return a.createdAt - b.createdAt;
+      if (sort === "priority") return priorityRank(a.priority) - priorityRank(b.priority) || b.createdAt - a.createdAt;
+      if (sort === "due") return (a.dueDate || "9999-99-99").localeCompare(b.dueDate || "9999-99-99") || b.createdAt - a.createdAt;
+      if (sort === "alphabetical") return a.title.localeCompare(b.title);
+      return b.createdAt - a.createdAt;
+    });
   }
 
-  function visibleTodos() {
-    const q = search.trim().toLowerCase();
-
-    return todos
-      .filter(todo => {
-        const matchesFilter =
-          filter === "all" ||
-          (filter === "active" && !todo.completed) ||
-          (filter === "completed" && todo.completed);
-
-        const matchesSearch =
-          !q ||
-          todo.title.toLowerCase().includes(q) ||
-          todo.category.toLowerCase().includes(q) ||
-          todo.priority.includes(q);
-
-        return matchesFilter && matchesSearch;
-      })
-      .sort((a, b) => {
-        if (sort === "oldest") return a.createdAt - b.createdAt;
-        if (sort === "priority") return priorityRank(a.priority) - priorityRank(b.priority) || b.createdAt - a.createdAt;
-        if (sort === "due") return (!a.dueDate ? 1 : !b.dueDate ? -1 : a.dueDate.localeCompare(b.dueDate)) || b.createdAt - a.createdAt;
-        if (sort === "alphabetical") return a.title.localeCompare(b.title);
-        return b.createdAt - a.createdAt;
-      });
+  function overdue(t) { return t.dueDate && !t.completed && t.dueDate < new Date().toISOString().slice(0,10); }
+  function dueText(value) {
+    if (!value) return "";
+    const d = new Date(value + "T00:00:00");
+    return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
   }
 
-  function dueLabel(date) {
-    if (!date) return "";
-    const d = new Date(date + "T00:00:00");
-    return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  }
-
-  function isOverdue(todo) {
-    return Boolean(todo.dueDate && !todo.completed && todo.dueDate < new Date().toISOString().slice(0, 10));
-  }
-
-  function stats() {
-    const done = todos.filter(todo => todo.completed).length;
-    totalCount.textContent = String(todos.length);
-    activeCount.textContent = String(todos.length - done);
-    completedCount.textContent = String(done);
-    if (markAll) markAll.disabled = !todos.length || done === todos.length;
-    if (clearCompleted) clearCompleted.disabled = !done;
-  }
-
-  function replaceTaskContent(li, todo) {
-    const body = li.querySelector(".task-body");
-    if (!body) return;
-
-    const title = document.createElement("span");
-    title.className = "task-title";
-    title.textContent = todo.title;
-
+  function makeMeta(t) {
     const meta = document.createElement("div");
     meta.className = "task-meta";
-
-    if (todo.priority !== "normal") {
+    if (t.priority !== "normal") {
       const p = document.createElement("span");
-      p.className = "priority " + todo.priority;
-      p.textContent = todo.priority;
-      meta.append(p);
+      p.className = "priority " + t.priority; p.textContent = t.priority; meta.append(p);
     }
-    if (todo.category) {
-      const c = document.createElement("span");
-      c.className = "category";
-      c.textContent = todo.category;
-      meta.append(c);
+    if (t.category) {
+      const c = document.createElement("span"); c.textContent = t.category; meta.append(c);
     }
-    if (todo.dueDate) {
+    if (t.dueDate) {
       const d = document.createElement("span");
-      d.className = "due" + (isOverdue(todo) ? " overdue" : "");
-      d.textContent = (isOverdue(todo) ? "Overdue · " : "Due · ") + dueLabel(todo.dueDate);
-      meta.append(d);
+      d.className = overdue(t) ? "due overdue" : "due";
+      d.textContent = (overdue(t) ? "Overdue · " : "Due · ") + dueText(t.dueDate); meta.append(d);
     }
-
-    body.replaceChildren(title, meta);
-    title.ondblclick = () => startEdit(li, todo);
+    return meta;
   }
 
-  function startEdit(li, todo) {
+  function editTask(li,t) {
     if (li.classList.contains("editing")) return;
     li.classList.add("editing");
-
     const editor = document.createElement("form");
     editor.className = "inline-editor";
-
-    const title = document.createElement("input");
-    title.value = todo.title;
-    title.maxLength = 240;
-    title.setAttribute("aria-label", "Edit task");
-
+    const title = Object.assign(document.createElement("input"),{value:t.title,maxLength:240});
+    title.setAttribute("aria-label","Task title");
     const priority = document.createElement("select");
-    ["low", "normal", "high"].forEach(value => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = value[0].toUpperCase() + value.slice(1);
-      option.selected = value === todo.priority;
-      priority.append(option);
+    ["low","normal","high"].forEach(v => {
+      const o = new Option(v[0].toUpperCase()+v.slice(1),v); o.selected = v === t.priority; priority.add(o);
     });
-
-    const category = document.createElement("input");
-    category.value = todo.category;
-    category.maxLength = 32;
-    category.placeholder = "Category";
-    category.setAttribute("aria-label", "Edit category");
-
-    const due = document.createElement("input");
-    due.type = "date";
-    due.value = todo.dueDate;
-    due.setAttribute("aria-label", "Edit due date");
-
-    const saveButton = document.createElement("button");
-    saveButton.type = "submit";
-    saveButton.textContent = "Save";
-
-    const cancelButton = document.createElement("button");
-    cancelButton.type = "button";
-    cancelButton.textContent = "Cancel";
-
-    editor.append(title, priority, category, due, saveButton, cancelButton);
-    li.querySelector(".task-body")?.replaceChildren(editor);
-
-    const finish = () => {
+    const category = Object.assign(document.createElement("input"),{value:t.category,maxLength:32,placeholder:"Category"});
+    category.setAttribute("aria-label","Category");
+    const due = Object.assign(document.createElement("input"),{type:"date",value:t.dueDate});
+    due.setAttribute("aria-label","Due date");
+    const saveBtn = Object.assign(document.createElement("button"),{type:"submit",textContent:"Save"});
+    const cancel = Object.assign(document.createElement("button"),{type:"button",textContent:"Cancel"});
+    editor.append(title,priority,category,due,saveBtn,cancel);
+    const body = li.querySelector(".task-body"); body.replaceChildren(editor);
+    editor.addEventListener("submit",e => {
+      e.preventDefault();
       const value = title.value.trim();
-      if (!value) {
-        title.focus();
-        return;
-      }
-      Object.assign(todo, {
-        title: value.slice(0, 240),
-        priority: priority.value,
-        category: category.value.trim().slice(0, 32),
-        dueDate: due.value,
-        updatedAt: Date.now()
-      });
-      save();
-      render();
-    };
-
-    editor.addEventListener("submit", event => {
-      event.preventDefault();
-      finish();
+      if (!value) { title.focus(); return; }
+      Object.assign(t,{title:value.slice(0,240),priority:priority.value,category:category.value.trim().slice(0,32),dueDate:due.value,updatedAt:Date.now()});
+      save(); render();
     });
-
-    cancelButton.addEventListener("click", render);
-    title.addEventListener("keydown", event => {
-      if (event.key === "Escape") render();
-    });
-
-    title.focus();
-    title.select();
+    cancel.addEventListener("click",render);
+    title.addEventListener("keydown",e => { if(e.key==="Escape") render(); });
+    title.focus(); title.select();
   }
 
-  function createItem(todo, index) {
+  function item(t) {
     const li = document.createElement("li");
-    li.className = "todo-item" + (todo.completed ? " done" : "");
-    li.dataset.id = todo.id;
-    li.draggable = true;
+    li.className = "todo-item" + (t.completed ? " done" : "");
+    li.dataset.id = t.id;
 
-    const drag = document.createElement("span");
-    drag.className = "drag-handle";
-    drag.textContent = "⋮⋮";
-    drag.setAttribute("aria-hidden", "true");
-    drag.title = "Drag to reorder";
+    const check = Object.assign(document.createElement("button"),{type:"button",className:"check",textContent:t.completed?"✓":""});
+    check.setAttribute("aria-label",t.completed ? "Mark task active" : "Complete task");
+    const body = document.createElement("div"); body.className="task-body";
+    const title = document.createElement("span"); title.className="task-title"; title.textContent=t.title;
+    body.append(title,makeMeta(t));
 
-    const check = document.createElement("button");
-    check.type = "button";
-    check.className = "check";
-    check.textContent = todo.completed ? "✓" : "";
-    check.setAttribute("aria-label", todo.completed ? "Mark " + todo.title + " active" : "Complete " + todo.title);
-    check.setAttribute("aria-pressed", String(todo.completed));
+    const edit = Object.assign(document.createElement("button"),{type:"button",className:"item-action edit",textContent:"Edit"});
+    const del = Object.assign(document.createElement("button"),{type:"button",className:"item-action delete",textContent:"×"});
+    edit.setAttribute("aria-label","Edit task"); del.setAttribute("aria-label","Delete task");
 
-    const body = document.createElement("div");
-    body.className = "task-body";
-    replaceTaskContent({ querySelector: selector => selector === ".task-body" ? body : null }, todo);
-
-    const editButton = document.createElement("button");
-    editButton.type = "button";
-    editButton.className = "item-action edit";
-    editButton.textContent = "Edit";
-    editButton.setAttribute("aria-label", "Edit " + todo.title);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.className = "item-action delete";
-    deleteButton.textContent = "×";
-    deleteButton.setAttribute("aria-label", "Delete " + todo.title);
-
-    check.addEventListener("click", () => {
-      todo.completed = !todo.completed;
-      todo.updatedAt = Date.now();
-      save();
-      render();
+    check.addEventListener("click",()=>{t.completed=!t.completed;t.updatedAt=Date.now();save();render();});
+    edit.addEventListener("click",()=>editTask(li,t));
+    del.addEventListener("click",()=>{
+      const remove=()=>{tasks=tasks.filter(x=>x.id!==t.id);save();render();};
+      if(reduceMotion) remove(); else {li.classList.add("removing");setTimeout(remove,180);}
     });
-
-    editButton.addEventListener("click", () => startEdit(li, todo));
-    deleteButton.addEventListener("click", () => {
-      const remove = () => {
-        todos = todos.filter(item => item.id !== todo.id);
-        save();
-        render();
-      };
-      if (reduceMotion) remove();
-      else {
-        li.classList.add("removing");
-        window.setTimeout(remove, 180);
-      }
-    });
-
-    li.append(drag, check, body, editButton, deleteButton);
-
-    li.addEventListener("dragstart", event => {
-      li.classList.add("dragging");
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", todo.id);
-    });
-
-    li.addEventListener("dragend", () => {
-      li.classList.remove("dragging");
-      list.querySelectorAll(".drag-over").forEach(node => node.classList.remove("drag-over"));
-      persistRenderedOrder();
-    });
-
-    li.addEventListener("dragover", event => {
-      event.preventDefault();
-      const dragging = list.querySelector(".dragging");
-      if (!dragging || dragging === li) return;
-      li.classList.add("drag-over");
-      const rect = li.getBoundingClientRect();
-      const before = event.clientY < rect.top + rect.height / 2;
-      list.insertBefore(dragging, before ? li : li.nextSibling);
-    });
-
-    li.addEventListener("dragleave", () => li.classList.remove("drag-over"));
-    li.addEventListener("drop", event => {
-      event.preventDefault();
-      li.classList.remove("drag-over");
-      persistRenderedOrder();
-    });
-
+    li.append(check,body,edit,del);
     return li;
   }
 
-  function persistRenderedOrder() {
-    const ids = [...list.querySelectorAll(".todo-item")].map(item => item.dataset.id);
-    const rankById = new Map(ids.map((id, index) => [id, index]));
-    todos.forEach(todo => {
-      if (rankById.has(todo.id)) todo.order = rankById.get(todo.id);
-    });
-    save();
-  }
-
   function render() {
-    const shown = visibleTodos();
-    list.replaceChildren(...shown.map(createItem));
-    emptyState.hidden = shown.length > 0;
-
-    if (!shown.length) {
-      const strong = emptyState.querySelector("strong");
-      if (strong) strong.textContent = search || filter !== "all" ? "No matching tasks" : "No tasks here";
+    const shown = visible();
+    list.replaceChildren(...shown.map(item));
+    const empty=$("emptyState"); if(empty) {
+      empty.hidden=shown.length>0;
+      const strong=empty.querySelector("strong");
+      if(strong) strong.textContent=query||filter!=="all"?"No matching tasks":"No tasks here";
     }
-
-    stats();
+    const done=tasks.filter(t=>t.completed).length;
+    $("totalCount").textContent=tasks.length;
+    $("activeCount").textContent=tasks.length-done;
+    $("completedCount").textContent=done;
+    $("markAll").disabled=!tasks.length || done===tasks.length;
+    $("clearCompleted").disabled=!done;
   }
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    const title = input.value.trim();
-    if (!title) {
-      input.focus();
-      return;
-    }
-
-    const now = Date.now();
-    todos.push({
-      id: uid(),
-      title: title.slice(0, 240),
-      completed: false,
-      priority: priorityInput?.value || "normal",
-      category: categoryInput?.value.trim().slice(0, 32) || "",
-      dueDate: dueDateInput?.value || "",
-      createdAt: now,
-      updatedAt: now,
-      order: todos.length
+  form.addEventListener("submit",e=>{
+    e.preventDefault();
+    const title=input.value.trim();
+    if(!title){input.focus();return;}
+    const now=Date.now();
+    tasks.push({
+      id:id(),title:title.slice(0,240),completed:false,
+      priority:$("priorityInput")?.value||"normal",
+      category:$("categoryInput")?.value.trim().slice(0,32)||"",
+      dueDate:$("dueDateInput")?.value||"",createdAt:now,updatedAt:now,order:tasks.length
     });
-
-    save();
-    input.value = "";
-    if (categoryInput) categoryInput.value = "";
-    if (dueDateInput) dueDateInput.value = "";
-    if (priorityInput) priorityInput.value = "normal";
-    render();
-    input.focus();
+    save(); input.value=""; $("categoryInput").value=""; $("dueDateInput").value=""; $("priorityInput").value="normal"; render(); input.focus();
   });
 
-  document.querySelectorAll(".filters button").forEach(button => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".filters button").forEach(item => item.classList.remove("active"));
-      button.classList.add("active");
-      filter = button.dataset.filter || "all";
-      render();
-    });
+  document.querySelectorAll(".filters button").forEach(btn=>btn.addEventListener("click",()=>{
+    document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active"); filter=btn.dataset.filter||"all"; render();
+  }));
+  $("searchInput")?.addEventListener("input",e=>{query=e.target.value;render();});
+  $("sortSelect")?.addEventListener("change",e=>{sort=e.target.value;render();});
+  $("markAll")?.addEventListener("click",()=>{tasks.forEach(t=>{t.completed=true;t.updatedAt=Date.now();});save();render();});
+  $("clearCompleted")?.addEventListener("click",()=>{tasks=tasks.filter(t=>!t.completed);save();render();});
+  addEventListener("storage",e=>{if(e.key===KEY){const incoming=parse(e.newValue||"[]");if(incoming){tasks=incoming;render();}}});
+  addEventListener("keydown",e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();$("searchInput")?.focus();}
+    if(e.key==="/" && document.activeElement?.tagName!=="INPUT"){e.preventDefault();$("searchInput")?.focus();}
   });
-
-  searchInput?.addEventListener("input", () => {
-    search = searchInput.value;
-    render();
-  });
-
-  sortSelect?.addEventListener("change", () => {
-    sort = sortSelect.value;
-    render();
-  });
-
-  markAll?.addEventListener("click", () => {
-    const now = Date.now();
-    todos.forEach(todo => {
-      todo.completed = true;
-      todo.updatedAt = now;
-    });
-    save();
-    render();
-  });
-
-  clearCompleted?.addEventListener("click", () => {
-    todos = todos.filter(todo => !todo.completed);
-    save();
-    render();
-  });
-
-  window.addEventListener("storage", event => {
-    if (event.key !== STORAGE_KEY) return;
-    const incoming = parseStored(event.newValue || "[]");
-    if (incoming) {
-      todos = incoming;
-      render();
-    }
-  });
-
   render();
 })();
