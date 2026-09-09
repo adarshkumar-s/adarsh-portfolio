@@ -126,80 +126,132 @@
     revealItems.forEach(item => observer.observe(item));
   }
 
-  /* ---------- smooth A / liquid-glass interaction ---------- */
+  /* ---------- localized liquid interaction on the supplied A ---------- */
   const stage = document.getElementById("hero-a-stage");
+  const svg = document.getElementById("hero-a-svg");
+  const baseA = stage?.querySelector(".hero-a-image");
   const displacement = document.getElementById("a-displace");
   const noise = document.getElementById("a-noise");
   const rippleGroup = document.getElementById("a-ripples");
 
-  if (stage && displacement && noise && rippleGroup && !reduceMotion && !touchDevice) {
+  if (stage && svg && baseA && displacement && noise && rippleGroup && !reduceMotion && !touchDevice) {
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const defs = svg.querySelector("defs");
+
+    /* The undisturbed source remains the sharp base. A duplicate of that exact
+       source is clipped to a small moving circle and receives the displacement. */
+    const clipPath = document.createElementNS(SVG_NS, "clipPath");
+    clipPath.id = "a-liquid-clip";
+    const clipCircle = document.createElementNS(SVG_NS, "circle");
+    clipCircle.setAttribute("cx", "320");
+    clipCircle.setAttribute("cy", "320");
+    clipCircle.setAttribute("r", "112");
+    clipPath.appendChild(clipCircle);
+    defs.appendChild(clipPath);
+
+    const liquidA = document.createElementNS(SVG_NS, "image");
+    liquidA.classList.add("hero-a-liquid");
+    liquidA.setAttribute("href", baseA.getAttribute("href"));
+    liquidA.setAttribute("x", "0");
+    liquidA.setAttribute("y", "0");
+    liquidA.setAttribute("width", "640");
+    liquidA.setAttribute("height", "640");
+    liquidA.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    liquidA.setAttribute("filter", "url(#a-liquid-filter)");
+    liquidA.setAttribute("clip-path", "url(#a-liquid-clip)");
+    liquidA.setAttribute("pointer-events", "none");
+    svg.appendChild(liquidA);
+
+    /* The original image is never filtered; only the local liquid copy is. */
+    baseA.removeAttribute("filter");
+
     let pointerInside = false;
     let raf = 0;
     let lastTime = performance.now();
     let lastPointerTime = performance.now();
-    let lastPointer = { x: 0, y: 0 };
+    let lastPointer = { x: 0.5, y: 0.5 };
     let pointer = { x: 0.5, y: 0.5 };
     let targetPointer = { x: 0.5, y: 0.5 };
+    let velocity = 0;
+    let targetVelocity = 0;
     let energy = 0;
     let targetEnergy = 0;
     let rippleCooldown = 0;
 
     const addRipple = (x, y, strength) => {
       if (rippleCooldown > 0) return;
-      rippleCooldown = 70;
+      rippleCooldown = 64;
 
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      const circle = document.createElementNS(SVG_NS, "circle");
       circle.setAttribute("cx", (x * 640).toFixed(2));
       circle.setAttribute("cy", (y * 640).toFixed(2));
-      circle.setAttribute("r", "2");
-      circle.setAttribute("stroke", "#f0d49b");
-      circle.setAttribute("stroke-width", "1");
-      circle.setAttribute("opacity", "0.55");
+      circle.setAttribute("r", "3");
+      circle._life = 1;
+      circle._strength = Math.min(1.4, Math.max(.35, strength));
+      circle._radius = 3;
       rippleGroup.appendChild(circle);
 
-      circle._life = 1;
-      circle._strength = Math.min(1.35, Math.max(.4, strength));
-      circle._radius = 2;
-
-      while (rippleGroup.childElementCount > 10) {
+      while (rippleGroup.childElementCount > 7) {
         rippleGroup.firstElementChild.remove();
       }
     };
 
     const animate = now => {
       raf = 0;
-      const dt = Math.min(32, now - lastTime);
+      const dt = Math.min(34, Math.max(8, now - lastTime));
+      const step = dt / 16.67;
       lastTime = now;
 
-      pointer.x += (targetPointer.x - pointer.x) * 0.12;
-      pointer.y += (targetPointer.y - pointer.y) * 0.12;
-      energy += (targetEnergy - energy) * 0.09;
-      targetEnergy *= Math.pow(0.84, dt / 16.67);
+      const follow = 1 - Math.pow(.001, dt / 220);
+      const settle = 1 - Math.pow(.001, dt / 300);
+
+      pointer.x += (targetPointer.x - pointer.x) * follow;
+      pointer.y += (targetPointer.y - pointer.y) * follow;
+      velocity += (targetVelocity - velocity) * .18;
+      energy += (targetEnergy - energy) * settle;
+
+      targetVelocity *= Math.pow(.68, dt / 16.67);
+      targetEnergy *= Math.pow(.72, dt / 16.67);
       rippleCooldown = Math.max(0, rippleCooldown - dt);
+
+      const px = pointer.x * 640;
+      const py = pointer.y * 640;
+      const radius = 92 + energy * 54;
+
+      clipCircle.setAttribute("cx", px.toFixed(2));
+      clipCircle.setAttribute("cy", py.toFixed(2));
+      clipCircle.setAttribute("r", radius.toFixed(2));
 
       stage.style.setProperty("--a-x", (pointer.x * 100).toFixed(2) + "%");
       stage.style.setProperty("--a-y", (pointer.y * 100).toFixed(2) + "%");
 
-      displacement.setAttribute("scale", (energy * 3.8).toFixed(2));
+      /* Local displacement is driven by velocity and decays like a soft spring. */
+      const displacementScale = Math.min(13.5, energy * 7.5 + velocity * 5.5);
+      displacement.setAttribute("scale", displacementScale.toFixed(2));
       noise.setAttribute(
         "baseFrequency",
-        (0.012 + energy * 0.002).toFixed(4) + " " +
-        (0.032 + energy * 0.004).toFixed(4)
+        (0.008 + energy * 0.006).toFixed(4) + " " +
+        (0.018 + energy * 0.010).toFixed(4)
       );
+      noise.setAttribute("seed", String(12 + Math.round(energy * 9)));
+
+      liquidA.style.opacity = String(Math.min(1, .78 + energy * .3));
 
       for (const circle of rippleGroup.children) {
-        circle._radius += (0.22 + circle._strength * 0.2) * (dt / 16.67);
-        circle._life -= 0.018 * (dt / 16.67);
+        circle._radius += (.5 + circle._strength * .65) * step;
+        circle._life -= .024 * step;
         circle.setAttribute("r", circle._radius.toFixed(2));
-        circle.setAttribute("opacity", Math.max(0, circle._life * 0.5).toFixed(3));
+        circle.setAttribute("opacity", Math.max(0, circle._life * .42).toFixed(3));
       }
 
-      while (rippleGroup.firstElementChild &&
-             Number(rippleGroup.firstElementChild.getAttribute("opacity")) <= 0) {
+      while (
+        rippleGroup.firstElementChild &&
+        Number(rippleGroup.firstElementChild.getAttribute("opacity")) <= 0
+      ) {
         rippleGroup.firstElementChild.remove();
       }
 
-      if (pointerInside || energy > 0.012 || rippleGroup.childElementCount) {
+      if (pointerInside || energy > .008 || rippleGroup.childElementCount) {
         raf = requestAnimationFrame(animate);
       }
     };
@@ -211,39 +263,49 @@
       }
     };
 
+    const localPoint = event => {
+      const rect = stage.getBoundingClientRect();
+      return {
+        x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)),
+        y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height))
+      };
+    };
+
     stage.addEventListener("pointerenter", event => {
       pointerInside = true;
-      const rect = stage.getBoundingClientRect();
-      const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-      const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-      targetPointer = { x, y };
-      addRipple(x, y, .75);
-      targetEnergy = Math.max(targetEnergy, .32);
+      const p = localPoint(event);
+      targetPointer = p;
+      pointer = p;
+      lastPointer = p;
+      lastPointerTime = performance.now();
+      targetVelocity = .2;
+      targetEnergy = .34;
+      addRipple(p.x, p.y, .6);
       startAnimation();
     }, { passive: true });
 
     stage.addEventListener("pointermove", event => {
-      const rect = stage.getBoundingClientRect();
-      const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-      const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-
+      const p = localPoint(event);
       const now = performance.now();
       const elapsed = Math.max(8, now - lastPointerTime);
-      const dx = (x - lastPointer.x) * rect.width;
-      const dy = (y - lastPointer.y) * rect.height;
+      const dx = (p.x - lastPointer.x) * stage.clientWidth;
+      const dy = (p.y - lastPointer.y) * stage.clientHeight;
       const speed = Math.min(1.5, Math.hypot(dx, dy) / elapsed);
 
-      targetPointer = { x, y };
-      targetEnergy = Math.min(1.2, .18 + speed * 2.4);
+      targetPointer = p;
+      targetVelocity = speed;
+      targetEnergy = Math.min(1.15, .12 + speed * 2.6);
 
-      if (speed > .045) addRipple(x, y, speed * 2);
-      lastPointer = { x, y };
+      if (speed > .035) addRipple(p.x, p.y, .45 + speed * 1.8);
+
+      lastPointer = p;
       lastPointerTime = now;
       startAnimation();
     }, { passive: true });
 
     stage.addEventListener("pointerleave", () => {
       pointerInside = false;
+      targetVelocity = 0;
       targetEnergy = 0;
       startAnimation();
     }, { passive: true });
