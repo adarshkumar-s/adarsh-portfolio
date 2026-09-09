@@ -130,18 +130,6 @@
       links.appendChild(link);
     });
 
-    const socials = document.createElement("div");
-    socials.className = "footer-socials";
-    socialItems.forEach(([label, href]) => {
-      const link = document.createElement("a");
-      link.href = href;
-      link.textContent = label;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      socials.appendChild(link);
-    });
-    links.appendChild(socials);
-
     grid.append(identity, links);
 
     const bottom = document.createElement("div");
@@ -154,7 +142,19 @@
     archive.href = "/projects/previous-portfolio";
     archive.textContent = "Previous portfolio →";
 
-    bottom.append(year, archive);
+    const socials = document.createElement("div");
+    socials.className = "footer-socials";
+    socialItems.forEach(([label, href]) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.textContent = label;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.className = "social-button";
+      socials.appendChild(link);
+    });
+
+    bottom.append(year, archive, socials);
     wrap.append(grid, bottom);
     footer.appendChild(wrap);
     footerHost.replaceChildren(footer);
