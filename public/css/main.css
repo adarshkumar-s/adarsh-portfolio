@@ -1597,3 +1597,54 @@ body::after{
 @media (hover:none), (pointer:coarse){
   .custom-cursor{display:none!important}
 }
+
+
+/* =========================================================
+   BRAND + HERO MARQUEE REFINEMENT
+   ========================================================= */
+.site-header .brand{
+  font-size:clamp(1.34rem,2vw,1.68rem);
+  letter-spacing:-.078em;
+  line-height:1;
+}
+.site-header .brand::after{width:5px;height:5px;margin-left:8px}
+
+/* Keep the existing marquee words, but present them as a contained, seamless strip. */
+.marquee{
+  position:relative;
+  width:calc(100% - (var(--gutter) * 2));
+  margin:0 auto;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:999px;
+  background:rgba(5,6,10,.72);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 45px rgba(0,0,0,.14);
+}
+.marquee div{
+  --marquee-gap:clamp(48px,7vw,96px);
+  display:flex;
+  align-items:center;
+  gap:var(--marquee-gap);
+  width:max-content;
+  min-width:max-content;
+  padding:15px 0;
+  white-space:nowrap;
+  animation:premiumMarquee 26s linear infinite;
+  will-change:transform;
+}
+.marquee div::after{
+  content:"INTERFACES ✦ JAVASCRIPT ✦ FULL-STACK WORK ✦ EXPERIMENTS ✦ INTERFACES ✦ JAVASCRIPT ✦ FULL-STACK WORK";
+  flex:none;
+  white-space:nowrap;
+  color:inherit;
+  font:inherit;
+  letter-spacing:inherit;
+}
+@keyframes premiumMarquee{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(calc(-50% - (var(--marquee-gap) / 2)),0,0)}
+}
+@media(max-width:600px){
+  .marquee{width:calc(100% - 24px);}
+  .marquee div{--marquee-gap:38px;font-size:.56rem;animation-duration:21s;padding:13px 0}
+}
+@media(prefers-reduced-motion:reduce){.marquee div{animation:none;transform:none}}

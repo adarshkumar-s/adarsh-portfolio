@@ -11,6 +11,28 @@
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const currentPath = location.pathname.replace(/\/$/, "") || "/";
 
+  /* ---------- shared brand asset ---------- */
+  const ensureBrandIcon = () => {
+    const head = document.head;
+    if (!head) return;
+    if (!head.querySelector('link[rel="icon"][data-adarsh-brand]')) {
+      const icon = document.createElement("link");
+      icon.rel = "icon";
+      icon.type = "image/svg+xml";
+      icon.href = "/assets/adarsh-a.svg";
+      icon.dataset.adarshBrand = "true";
+      head.appendChild(icon);
+    }
+    if (!head.querySelector('link[rel="apple-touch-icon"][data-adarsh-brand]')) {
+      const touchIcon = document.createElement("link");
+      touchIcon.rel = "apple-touch-icon";
+      touchIcon.href = "/assets/adarsh-a.svg";
+      touchIcon.dataset.adarshBrand = "true";
+      head.appendChild(touchIcon);
+    }
+  };
+  ensureBrandIcon();
+
   /* ---------- shared navigation ---------- */
   const navHost = document.getElementById("site-nav");
   if (navHost) {
@@ -85,7 +107,7 @@
     const brand = document.createElement("a");
     brand.className = "brand";
     brand.href = "/";
-    brand.textContent = "Adarsh";
+    brand.textContent = "Adarsh Kumar";
 
     const note = document.createElement("p");
     note.textContent = "Projects, experiments, tools and notes.";
