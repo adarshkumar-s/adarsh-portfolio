@@ -1,139 +1,348 @@
 (() => {
-  const navItems=[["/","Home"],["/projects","Projects"],["/labs","Labs"],["/tools","Tools"],["/blog","Blog"],["/about","About"],["/stats","Stats"],["/contact","Contact"]];
-  const current=location.pathname.replace(/\/$/,"")||"/";
-  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const coarse=window.matchMedia("(hover: none)").matches;
+  "use strict";
 
-  const navHost=document.getElementById("site-nav");
-  if(navHost){
-    const header=document.createElement("header"); header.className="site-header";
-    const wrap=document.createElement("div"); wrap.className="shell nav";
-    const brand=document.createElement("a"); brand.className="brand"; brand.href="/"; brand.textContent="Adarsh.";
-    const menu=document.createElement("button"); menu.className="menu"; menu.type="button";
-    menu.setAttribute("aria-label","Open navigation"); menu.setAttribute("aria-expanded","false"); menu.textContent="☰";
-    const nav=document.createElement("nav"); nav.className="nav-links"; nav.setAttribute("aria-label","Primary navigation");
-    navItems.forEach(([href,label])=>{const a=document.createElement("a");a.href=href;a.textContent=label;if(current===href)a.setAttribute("aria-current","page");nav.appendChild(a)});
-    menu.addEventListener("click",()=>{const open=nav.classList.toggle("open");menu.setAttribute("aria-expanded",String(open));menu.setAttribute("aria-label",open?"Close navigation":"Open navigation")});
-    wrap.append(brand,menu,nav); header.append(wrap); navHost.replaceChildren(header);
-  }
+  const navItems = [
+    ["/", "Home"], ["/projects", "Projects"], ["/labs", "Labs"],
+    ["/tools", "Tools"], ["/blog", "Blog"], ["/about", "About"],
+    ["/stats", "Stats"], ["/contact", "Contact"]
+  ];
 
-  const footerHost=document.getElementById("site-footer");
-  if(footerHost){
-    const footer=document.createElement("footer"); footer.className="site-footer";
-    const wrap=document.createElement("div"); wrap.className="shell";
-    const grid=document.createElement("div"); grid.className="footer-grid";
-    const identity=document.createElement("div");
-    const brand=document.createElement("a"); brand.className="brand"; brand.href="/"; brand.textContent="Adarsh.";
-    const note=document.createElement("p"); note.textContent="Current developer platform — projects, labs, tools and notes.";
-    identity.append(brand,note);
-    const links=document.createElement("div"); links.className="footer-links";
-    navItems.slice(1).forEach(([href,label])=>{const a=document.createElement("a");a.href=href;a.textContent=label;links.appendChild(a)});
-    grid.append(identity,links);
-    const bottom=document.createElement("div"); bottom.className="footer-bottom";
-    const year=document.createElement("span"); year.textContent="© "+new Date().getFullYear()+" Adarsh Kumar";
-    const archive=document.createElement("a"); archive.href="/projects/previous-portfolio"; archive.textContent="Previous portfolio →";
-    bottom.append(year,archive); wrap.append(grid,bottom); footer.append(wrap); footerHost.replaceChildren(footer);
-  }
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const touchDevice = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  const currentPath = location.pathname.replace(/\/$/, "") || "/";
 
-  document.querySelectorAll('a[target="_blank"]').forEach(a=>a.rel="noopener noreferrer");
+  /* ---------- shared navigation ---------- */
+  const navHost = document.getElementById("site-nav");
+  if (navHost) {
+    const header = document.createElement("header");
+    header.className = "site-header";
 
-  /* ---------------------------------------------------------
-     MONOGRAM WATER FIELD
-     A traced from the supplied reference. SVG displacement is
-     driven by pointer velocity; ripple rings persist briefly.
-     --------------------------------------------------------- */
-  const stage=document.getElementById("hero-a-stage");
-  const svg=document.getElementById("hero-a-svg");
-  const displacement=document.getElementById("a-displace");
-  const noise=document.getElementById("a-noise");
-  const rippleGroup=document.getElementById("a-ripples");
+    const wrap = document.createElement("div");
+    wrap.className = "shell nav";
 
-  if(stage&&svg&&!reduce&&!coarse){
-    let lastX=0,lastY=0,lastT=performance.now(),energy=0,raf=0;
-    const ripples=[];
-    const addRipple=(x,y,power=1)=>{
-      const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
-      c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r","3");
-      c.setAttribute("stroke","rgba(255,245,215,.68)");c.setAttribute("stroke-width","1.1");
-      c.setAttribute("opacity",".72"); rippleGroup.appendChild(c);
-      ripples.push({el:c,x,y,r:3,life:1,power});
-      if(ripples.length>18){ripples.shift().el.remove()}
-    };
-    const pointer=e=>{
-      const r=stage.getBoundingClientRect();
-      const x=Math.max(0,Math.min(270,(e.clientX-r.left)/r.width*270));
-      const y=Math.max(0,Math.min(320,(e.clientY-r.top)/r.height*320));
-      const now=performance.now(),dt=Math.max(8,now-lastT),vx=x-lastX,vy=y-lastY;
-      const speed=Math.min(1.8,Math.hypot(vx,vy)/(dt*.8));
-      lastX=x;lastY=y;lastT=now;
-      energy=Math.min(2.8,energy+speed*.75);
-      stage.style.setProperty("--a-x",(x/270*100)+"%");
-      stage.style.setProperty("--a-y",(y/320*100)+"%");
-      if(speed>.12)addRipple(x,y,Math.min(1.5,.45+speed));
-    };
-    stage.addEventListener("pointermove",pointer,{passive:true});
-    stage.addEventListener("pointerenter",e=>{
-      const r=stage.getBoundingClientRect();
-      addRipple((e.clientX-r.left)/r.width*270,(e.clientY-r.top)/r.height*320,1.2);
+    const brand = document.createElement("a");
+    brand.className = "brand";
+    brand.href = "/";
+    brand.textContent = "Adarsh";
+
+    const menu = document.createElement("button");
+    menu.className = "menu";
+    menu.type = "button";
+    menu.setAttribute("aria-label", "Open navigation");
+    menu.setAttribute("aria-expanded", "false");
+    menu.textContent = "☰";
+
+    const nav = document.createElement("nav");
+    nav.className = "nav-links";
+    nav.setAttribute("aria-label", "Primary navigation");
+
+    navItems.forEach(([href, label]) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.textContent = label;
+      if (currentPath === href) link.setAttribute("aria-current", "page");
+      nav.appendChild(link);
     });
-    const tick=()=>{
-      energy*=.965;
-      if(displacement)displacement.setAttribute("scale",(energy*8).toFixed(2));
-      if(noise)noise.setAttribute("baseFrequency",(.008+energy*.0015).toFixed(4)+" "+(.028+energy*.004).toFixed(4));
-      for(let i=ripples.length-1;i>=0;i--){
-        const q=ripples[i]; q.r+=.7+q.power*.34; q.life-=.018;
-        q.el.setAttribute("r",q.r.toFixed(2)); q.el.setAttribute("opacity",Math.max(0,q.life*.45).toFixed(3));
-        q.el.setAttribute("stroke-width",(1+q.life*2*q.power).toFixed(2));
-        if(q.life<=0){q.el.remove();ripples.splice(i,1)}
+
+    menu.addEventListener("click", () => {
+      const open = nav.classList.toggle("open");
+      menu.setAttribute("aria-expanded", String(open));
+      menu.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    });
+
+    wrap.append(brand, menu, nav);
+    header.appendChild(wrap);
+    navHost.replaceChildren(header);
+  }
+
+  /* ---------- shared footer ---------- */
+  const footerHost = document.getElementById("site-footer");
+  if (footerHost) {
+    const footer = document.createElement("footer");
+    footer.className = "site-footer";
+
+    const wrap = document.createElement("div");
+    wrap.className = "shell";
+
+    const grid = document.createElement("div");
+    grid.className = "footer-grid";
+
+    const identity = document.createElement("div");
+    const brand = document.createElement("a");
+    brand.className = "brand";
+    brand.href = "/";
+    brand.textContent = "Adarsh";
+
+    const note = document.createElement("p");
+    note.textContent = "Projects, experiments, tools and notes.";
+
+    identity.append(brand, note);
+
+    const links = document.createElement("div");
+    links.className = "footer-links";
+
+    navItems.slice(1).forEach(([href, label]) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.textContent = label;
+      links.appendChild(link);
+    });
+
+    grid.append(identity, links);
+
+    const bottom = document.createElement("div");
+    bottom.className = "footer-bottom";
+
+    const year = document.createElement("span");
+    year.textContent = "© " + new Date().getFullYear() + " Adarsh Kumar";
+
+    const archive = document.createElement("a");
+    archive.href = "/projects/previous-portfolio";
+    archive.textContent = "Previous portfolio →";
+
+    bottom.append(year, archive);
+    wrap.append(grid, bottom);
+    footer.appendChild(wrap);
+    footerHost.replaceChildren(footer);
+  }
+
+  document.querySelectorAll('a[target="_blank"]').forEach(link => {
+    link.rel = "noopener noreferrer";
+  });
+
+  /* ---------- restrained entrance reveals ---------- */
+  const revealItems = document.querySelectorAll(".js-reveal, .reveal");
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    revealItems.forEach(item => item.classList.add("is-visible"));
+  } else {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+
+    revealItems.forEach(item => observer.observe(item));
+  }
+
+  /* ---------- smooth A / liquid-glass interaction ---------- */
+  const stage = document.getElementById("hero-a-stage");
+  const displacement = document.getElementById("a-displace");
+  const noise = document.getElementById("a-noise");
+  const rippleGroup = document.getElementById("a-ripples");
+
+  if (stage && displacement && noise && rippleGroup && !reduceMotion && !touchDevice) {
+    let pointerInside = false;
+    let raf = 0;
+    let lastTime = performance.now();
+    let lastPointer = { x: 0, y: 0 };
+    let pointer = { x: 0.5, y: 0.5 };
+    let targetPointer = { x: 0.5, y: 0.5 };
+    let energy = 0;
+    let targetEnergy = 0;
+    let rippleCooldown = 0;
+
+    const addRipple = (x, y, strength) => {
+      if (rippleCooldown > 0) return;
+      rippleCooldown = 70;
+
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", (x * 640).toFixed(2));
+      circle.setAttribute("cy", (y * 640).toFixed(2));
+      circle.setAttribute("r", "2");
+      circle.setAttribute("stroke", "#f0d49b");
+      circle.setAttribute("stroke-width", "1");
+      circle.setAttribute("opacity", "0.55");
+      rippleGroup.appendChild(circle);
+
+      circle._life = 1;
+      circle._strength = Math.min(1.35, Math.max(.4, strength));
+      circle._radius = 2;
+
+      while (rippleGroup.childElementCount > 10) {
+        rippleGroup.firstElementChild.remove();
       }
-      raf=requestAnimationFrame(tick);
     };
-    raf=requestAnimationFrame(tick);
-    window.addEventListener("pagehide",()=>cancelAnimationFrame(raf),{once:true});
+
+    const animate = now => {
+      raf = 0;
+      const dt = Math.min(32, now - lastTime);
+      lastTime = now;
+
+      pointer.x += (targetPointer.x - pointer.x) * 0.12;
+      pointer.y += (targetPointer.y - pointer.y) * 0.12;
+      energy += (targetEnergy - energy) * 0.09;
+      targetEnergy *= Math.pow(0.84, dt / 16.67);
+      rippleCooldown = Math.max(0, rippleCooldown - dt);
+
+      stage.style.setProperty("--a-x", (pointer.x * 100).toFixed(2) + "%");
+      stage.style.setProperty("--a-y", (pointer.y * 100).toFixed(2) + "%");
+
+      displacement.setAttribute("scale", (energy * 3.8).toFixed(2));
+      noise.setAttribute(
+        "baseFrequency",
+        (0.012 + energy * 0.002).toFixed(4) + " " +
+        (0.032 + energy * 0.004).toFixed(4)
+      );
+
+      for (const circle of rippleGroup.children) {
+        circle._radius += (0.22 + circle._strength * 0.2) * (dt / 16.67);
+        circle._life -= 0.018 * (dt / 16.67);
+        circle.setAttribute("r", circle._radius.toFixed(2));
+        circle.setAttribute("opacity", Math.max(0, circle._life * 0.5).toFixed(3));
+      }
+
+      while (rippleGroup.firstElementChild &&
+             Number(rippleGroup.firstElementChild.getAttribute("opacity")) <= 0) {
+        rippleGroup.firstElementChild.remove();
+      }
+
+      if (pointerInside || energy > 0.012 || rippleGroup.childElementCount) {
+        raf = requestAnimationFrame(animate);
+      }
+    };
+
+    const startAnimation = () => {
+      if (!raf) {
+        lastTime = performance.now();
+        raf = requestAnimationFrame(animate);
+      }
+    };
+
+    stage.addEventListener("pointerenter", event => {
+      pointerInside = true;
+      const rect = stage.getBoundingClientRect();
+      const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+      const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+      targetPointer = { x, y };
+      addRipple(x, y, .75);
+      targetEnergy = Math.max(targetEnergy, .32);
+      startAnimation();
+    }, { passive: true });
+
+    stage.addEventListener("pointermove", event => {
+      const rect = stage.getBoundingClientRect();
+      const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+      const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+
+      const now = performance.now();
+      const elapsed = Math.max(8, now - lastTime);
+      const dx = (x - lastPointer.x) * rect.width;
+      const dy = (y - lastPointer.y) * rect.height;
+      const speed = Math.min(1.5, Math.hypot(dx, dy) / elapsed);
+
+      targetPointer = { x, y };
+      targetEnergy = Math.min(1.2, .18 + speed * 2.4);
+
+      if (speed > .045) addRipple(x, y, speed * 2);
+      lastPointer = { x, y };
+      startAnimation();
+    }, { passive: true });
+
+    stage.addEventListener("pointerleave", () => {
+      pointerInside = false;
+      targetEnergy = 0;
+      startAnimation();
+    }, { passive: true });
   }
 
-  /* ---------------------------------------------------------
-     Project object interaction — tiny tilt + local light.
-     --------------------------------------------------------- */
-  if(!reduce&&!coarse){
-    document.querySelectorAll(".tilt-card").forEach(card=>{
-      card.addEventListener("pointermove",e=>{
-        const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
-        const rx=(.5-py)*3,ry=(px-.5)*3;
-        card.style.setProperty("--mx",(px*100).toFixed(1)+"%");
-        card.style.setProperty("--my",(py*100).toFixed(1)+"%");
-        card.style.transform="perspective(1100px) rotateX("+rx.toFixed(2)+"deg) rotateY("+ry.toFixed(2)+"deg) translateY(-4px)";
-      });
-      card.addEventListener("pointerleave",()=>{card.style.transform=""});
+  /* ---------- subtle project-card tilt / local light ---------- */
+  if (!reduceMotion && !touchDevice) {
+    document.querySelectorAll(".tilt-card").forEach(card => {
+      let frame = 0;
+      let rx = 0;
+      let ry = 0;
+      let targetRx = 0;
+      let targetRy = 0;
+
+      const render = () => {
+        frame = 0;
+        rx += (targetRx - rx) * .13;
+        ry += (targetRy - ry) * .13;
+        card.style.transform =
+          "perspective(1200px) rotateX(" + rx.toFixed(2) +
+          "deg) rotateY(" + ry.toFixed(2) + "deg) translateY(-3px)";
+        if (Math.abs(targetRx - rx) > .01 || Math.abs(targetRy - ry) > .01) {
+          frame = requestAnimationFrame(render);
+        }
+      };
+
+      card.addEventListener("pointermove", event => {
+        const rect = card.getBoundingClientRect();
+        const px = (event.clientX - rect.left) / rect.width;
+        const py = (event.clientY - rect.top) / rect.height;
+        targetRx = (0.5 - py) * 2.2;
+        targetRy = (px - 0.5) * 2.2;
+        card.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
+        card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+        if (!frame) frame = requestAnimationFrame(render);
+      }, { passive: true });
+
+      card.addEventListener("pointerleave", () => {
+        targetRx = 0;
+        targetRy = 0;
+        if (!frame) frame = requestAnimationFrame(render);
+      }, { passive: true });
     });
   }
 
-  /* ---------------------------------------------------------
-     Entrance reveal — native IntersectionObserver only.
-     --------------------------------------------------------- */
-  if(!reduce&&"IntersectionObserver"in window){
-    const io=new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{
-        if(entry.isIntersecting){entry.target.classList.add("is-visible");io.unobserve(entry.target)}
-      });
-    },{threshold:.12});
-    document.querySelectorAll(".js-reveal").forEach(el=>io.observe(el));
-  }else{
-    document.querySelectorAll(".js-reveal").forEach(el=>el.classList.add("is-visible"));
-  }
+  /* ---------- desktop cursor with context-aware states ---------- */
+  if (!reduceMotion && !touchDevice) {
+    const cursor = document.createElement("div");
+    cursor.className = "custom-cursor";
+    cursor.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cursor);
 
-  /* ---------------------------------------------------------
-     Refined cursor for desktop pointer devices.
-     --------------------------------------------------------- */
-  if(!reduce&&!coarse){
-    const cursor=document.createElement("div");cursor.className="custom-cursor";document.body.appendChild(cursor);
-    let tx=-100,ty=-100,x=-100,y=-100;
-    const tick=()=>{x+=(tx-x)*.16;y+=(ty-y)*.16;cursor.style.transform="translate3d("+x+"px,"+y+"px,0) translate(-50%,-50%)";requestAnimationFrame(tick)};
-    document.addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY},{passive:true});
-    requestAnimationFrame(tick);
-    document.querySelectorAll("a,.button,.tilt-card,.project-media").forEach(el=>{
-      el.addEventListener("pointerenter",()=>cursor.classList.add("is-link"));
-      el.addEventListener("pointerleave",()=>cursor.classList.remove("is-link"));
-    });
+    let targetX = -80;
+    let targetY = -80;
+    let x = -80;
+    let y = -80;
+    let frame = 0;
+
+    const render = () => {
+      frame = 0;
+      x += (targetX - x) * .19;
+      y += (targetY - y) * .19;
+      cursor.style.transform =
+        "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) translate(-50%,-50%)";
+      if (Math.abs(targetX - x) > .1 || Math.abs(targetY - y) > .1) {
+        frame = requestAnimationFrame(render);
+      }
+    };
+
+    document.addEventListener("pointermove", event => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      cursor.style.opacity = "1";
+      if (!frame) frame = requestAnimationFrame(render);
+    }, { passive: true });
+
+    document.addEventListener("pointerover", event => {
+      const target = event.target.closest?.("[data-cursor-label], .button, .text-link, .hero-a-stage");
+      if (!target) return;
+
+      cursor.classList.remove("is-link", "is-project", "is-a");
+
+      if (target.classList.contains("hero-a-stage")) {
+        cursor.classList.add("is-a");
+        return;
+      }
+
+      if (target.dataset.cursorLabel) {
+        cursor.classList.add("is-project");
+        cursor.dataset.label = target.dataset.cursorLabel;
+        return;
+      }
+
+      cursor.classList.add("is-link");
+    }, { passive: true });
+
+    document.addEventListener("pointerout", event => {
+      const target = event.target.closest?.("[data-cursor-label], .button, .text-link, .hero-a-stage");
+      if (!target || target.contains(event.relatedTarget)) return;
+      cursor.classList.remove("is-link", "is-project", "is-a");
+      cursor.removeAttribute("data-label");
+    }, { passive: true });
   }
 })();
