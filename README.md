@@ -1,15 +1,57 @@
-# Adarsh — Developer Platform
+# Adarsh — Current Developer Platform
 
-Premium replacement of the original portfolio.
+This branch contains the current personal developer platform. The previous portfolio is intentionally preserved as an archived project rather than deleted.
 
-## Run
-npm install
-npm start
+## Run locally
 
-Open http://localhost:3000.
+`npm install`
+`npm test`
+`npm start`
 
-Routes: /, /projects, /projects/todo-app, /projects/character-gallery, /labs, /tools, /blog, /blog/building-a-developer-platform, /about, /contact, /stats, /todo.
+Open `http://localhost:3000`.
 
-The platform uses a zero-dependency Node HTTP server. Browser tools are local-only. Todo data stays in localStorage. Contact does not claim delivery without an email provider. Stats are not fabricated and remain ready for verified GitHub API integration.
+## Current routes
 
-Existing imagery and Todo functionality are preserved. Missing biography, achievements, metrics, testimonials, live-demo URLs and email address are explicitly marked as placeholders.
+- /
+- /projects
+- /projects/anshika-studio
+- /projects/todo-app
+- /projects/previous-portfolio
+- /projects/character-gallery
+- /labs
+- /tools
+- /blog
+- /about
+- /contact
+- /stats
+- /todo
+- /archive/previous-portfolio/
+
+## Projects
+
+Only four projects are presented:
+
+1. Anshika Studio — verified from the connected GitHub repository.
+2. Todo App — preserved as a working browser application and case study.
+3. Previous Portfolio — the original portfolio is preserved under `public/archive/previous-portfolio/`.
+4. Character Gallery — the earlier visual experiment using existing assets.
+
+No fabricated projects, statistics, employment, education, clients, testimonials or achievements are included.
+
+## Vercel
+
+The site is a static multi-page deployment. `vercel.json` explicitly maps clean URLs to HTML files and supplies security headers. `server.js` remains the local Node server; it is not required to render the static Vercel site.
+
+## Security
+
+- No secrets are stored in frontend code.
+- `.env` files are ignored; `.env.example` contains placeholders only.
+- Local routing rejects traversal attempts.
+- Security headers include CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy and Permissions-Policy.
+- Browser Todo state remains localStorage data.
+- Browser tools do not upload their inputs.
+- Contact validation does not claim email delivery without a configured provider.
+
+## Content policy
+
+Unknown personal information remains unknown. Real project facts are sourced from repository evidence. Live demo URLs, email delivery and verified GitHub activity are not claimed unless configured or verified.
