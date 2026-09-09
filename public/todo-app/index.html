@@ -3,50 +3,37 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#08090d">
-<title>Todo App — Adarsh Kumar</title>
+<title>Todo — Adarsh Kumar</title>
 <link rel="icon" type="image/svg+xml" href="/assets/adarsh-a-favicon.svg">
 <link rel="apple-touch-icon" href="/assets/adarsh-a-favicon.svg">
 <link rel="stylesheet" href="/css/todo.css">
 </head>
 <body>
 <main class="todo-wrap">
-  <a class="back" href="/projects/todo-app">← Back to project</a>
-  <section class="todo-app" aria-labelledby="todo-title">
-    <header class="todo-header">
-      <div><span class="eyebrow">TODO APP</span><h1 id="todo-title">My Todo List</h1></div>
-      <div class="stats" aria-label="Task statistics">
-        <div><strong id="totalCount">0</strong><span>Total</span></div>
-        <div><strong id="activeCount">0</strong><span>Active</span></div>
-        <div><strong id="completedCount">0</strong><span>Done</span></div>
-      </div>
-    </header>
-    <form id="todoForm" class="composer" novalidate>
-      <label class="sr-only" for="todoInput">New task</label>
-      <input id="todoInput" type="text" maxlength="240" placeholder="Add a new task…" autocomplete="off" required>
-      <label class="sr-only" for="priorityInput">Priority</label>
-      <select id="priorityInput"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
-      <label class="sr-only" for="categoryInput">Category</label>
-      <input id="categoryInput" type="text" maxlength="32" placeholder="Category" autocomplete="off">
-      <label class="sr-only" for="dueDateInput">Due date</label>
-      <input id="dueDateInput" type="date">
-      <button class="add-button" type="submit">Add task <span aria-hidden="true">↗</span></button>
-    </form>
-    <div class="controls">
-      <label class="search"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search tasks…" aria-label="Search tasks"></label>
-      <div class="filters" role="group" aria-label="Filter tasks">
-        <button type="button" class="active" data-filter="all" aria-pressed="true">All</button>
-        <button type="button" data-filter="active" aria-pressed="false">Active</button>
-        <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
-      </div>
-      <label class="sort-control"><span>Sort</span><select id="sortSelect" aria-label="Sort tasks">
-        <option value="created">Newest</option><option value="oldest">Oldest</option><option value="priority">Priority</option><option value="due">Due date</option><option value="alphabetical">A–Z</option>
-      </select></label>
-    </div>
-    <div class="bulk-actions"><button id="markAll" type="button">Mark all complete</button><button id="clearCompleted" type="button">Clear completed</button></div>
-    <div id="emptyState" class="empty-state"><span aria-hidden="true">✓</span><strong>No tasks here</strong><small>Add a task to get started.</small></div>
-    <ul id="todoList" aria-live="polite" aria-label="Tasks"></ul>
-  </section>
+<a class="back" href="/projects/todo-app">← Back to project</a>
+<section class="todo-app" aria-labelledby="todo-title">
+<header class="todo-header">
+<div><span class="eyebrow">TODO APP</span><h1 id="todo-title">My Todo List</h1></div>
+<div class="stats" aria-label="Task statistics">
+<div><strong id="totalCount">0</strong><span>Total</span></div><div><strong id="activeCount">0</strong><span>Active</span></div><div><strong id="completedCount">0</strong><span>Done</span></div>
+</div>
+</header>
+<form id="todoForm" class="composer" novalidate>
+<label class="sr-only" for="todoInput">New task</label><input id="todoInput" maxlength="240" placeholder="Add a new task…" autocomplete="off" required>
+<label class="sr-only" for="priorityInput">Priority</label><select id="priorityInput"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
+<label class="sr-only" for="categoryInput">Category</label><input id="categoryInput" maxlength="32" placeholder="Category" autocomplete="off">
+<label class="sr-only" for="dueDateInput">Due date</label><input id="dueDateInput" type="date">
+<button class="add-button" type="submit">Add task <span aria-hidden="true">↗</span></button>
+</form>
+<div class="controls">
+<label class="search"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search tasks…" aria-label="Search tasks"></label>
+<div class="filters" role="group" aria-label="Filter tasks"><button type="button" class="active" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="active" aria-pressed="false">Active</button><button type="button" data-filter="completed" aria-pressed="false">Completed</button></div>
+<label class="sort-control"><span>Sort</span><select id="sortSelect" aria-label="Sort tasks"><option value="created">Newest</option><option value="oldest">Oldest</option><option value="priority">Priority</option><option value="due">Due date</option><option value="alphabetical">A–Z</option></select></label>
+</div>
+<div class="bulk-actions"><button id="markAll" type="button">Mark all complete</button><button id="clearCompleted" type="button">Clear completed</button></div>
+<div id="emptyState" class="empty-state"><span aria-hidden="true">✓</span><strong>No tasks here</strong><small>Add a task to get started.</small></div>
+<ul id="todoList" aria-live="polite" aria-label="Tasks"></ul>
+</section>
 </main>
 <script src="/js/todo.js" defer></script>
-</body>
-</html>
+</body></html>
