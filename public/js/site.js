@@ -370,7 +370,8 @@
     const cursor = document.createElement("div");
     cursor.className = "custom-cursor";
     cursor.setAttribute("aria-hidden", "true");
-    document.body.appendChild(cursor);\n    document.body.classList.add("has-custom-cursor");
+    document.body.appendChild(cursor);
+    document.body.classList.add("has-custom-cursor");
 
     let targetX = -80;
     let targetY = -80;
