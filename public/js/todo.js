@@ -190,7 +190,7 @@
 
   document.querySelectorAll(".filters button").forEach(btn=>btn.addEventListener("click",()=>{
     document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active"); filter=btn.dataset.filter||"all"; render();
+    btn.classList.add("active"); document.querySelectorAll(".filters button").forEach(b=>b.setAttribute("aria-pressed",String(b===btn))); filter=btn.dataset.filter||"all"; render();
   }));
   $("searchInput")?.addEventListener("input",e=>{query=e.target.value;render();});
   $("sortSelect")?.addEventListener("change",e=>{sort=e.target.value;render();});
