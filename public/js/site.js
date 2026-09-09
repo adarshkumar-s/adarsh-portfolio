@@ -136,6 +136,7 @@
     let pointerInside = false;
     let raf = 0;
     let lastTime = performance.now();
+    let lastPointerTime = performance.now();
     let lastPointer = { x: 0, y: 0 };
     let pointer = { x: 0.5, y: 0.5 };
     let targetPointer = { x: 0.5, y: 0.5 };
@@ -227,7 +228,7 @@
       const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
 
       const now = performance.now();
-      const elapsed = Math.max(8, now - lastTime);
+      const elapsed = Math.max(8, now - lastPointerTime);
       const dx = (x - lastPointer.x) * rect.width;
       const dy = (y - lastPointer.y) * rect.height;
       const speed = Math.min(1.5, Math.hypot(dx, dy) / elapsed);
@@ -237,6 +238,7 @@
 
       if (speed > .045) addRipple(x, y, speed * 2);
       lastPointer = { x, y };
+      lastPointerTime = now;
       startAnimation();
     }, { passive: true });
 
