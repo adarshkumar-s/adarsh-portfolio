@@ -1480,3 +1480,20 @@ body::after{
   .hero-a-svg{filter:drop-shadow(0 30px 52px rgba(0,0,0,.44))}
   .js-reveal,.reveal{transition:none!important}
 }
+
+
+/* Local liquid duplicate: same supplied A, clipped only where the pointer touches. */
+.hero-a-liquid{
+  display:block;
+  opacity:.84;
+  mix-blend-mode:normal;
+  transform:none;
+  pointer-events:none;
+  will-change:opacity;
+}
+
+/* Slightly more physical project light without increasing card size. */
+.old-style-project{
+  --mx:50%;
+  --my:50%;
+}
