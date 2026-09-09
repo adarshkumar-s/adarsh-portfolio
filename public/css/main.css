@@ -476,7 +476,7 @@ body::after{
 }
 .old-style-project{
   position:relative;
-  flex:0 0 clamp(390px,38vw,590px);
+  flex:0 0 clamp(360px,34vw,540px);
   overflow:hidden;
   border:1px solid rgba(255,255,255,.12);
   border-radius:30px;
@@ -488,17 +488,17 @@ body::after{
   border-color:rgba(216,173,91,.28);
   box-shadow:0 38px 110px rgba(0,0,0,.5);
 }
-.featured-rail-card{flex-basis:clamp(430px,43vw,650px)}
-.compact-rail-card{flex-basis:clamp(340px,31vw,470px)}
+.featured-rail-card{flex-basis:clamp(390px,39vw,570px)}
+.compact-rail-card{flex-basis:clamp(320px,28vw,430px)}
 .project-media{
   position:relative;
   display:block;
-  height:clamp(330px,38vw,500px);
+  height:clamp(300px,31vw,440px);
   overflow:hidden;
   border-bottom:1px solid rgba(255,255,255,.1);
   background:#08090c;
 }
-.featured-rail-card .project-media{height:clamp(360px,43vw,560px)}
+.featured-rail-card .project-media{height:clamp(330px,36vw,490px)}
 .project-media::before{
   content:"";
   position:absolute;
