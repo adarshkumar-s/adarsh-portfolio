@@ -1497,3 +1497,13 @@ body::after{
   --mx:50%;
   --my:50%;
 }
+
+
+.site-header.is-scrolled{
+  background:rgba(5,6,8,.9);
+  border-bottom-color:rgba(214,173,98,.13);
+  box-shadow:0 14px 36px rgba(0,0,0,.18);
+}
+@media(prefers-reduced-motion:reduce){
+  .site-header{transition:none}
+}
