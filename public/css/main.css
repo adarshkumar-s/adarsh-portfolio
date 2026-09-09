@@ -336,7 +336,7 @@ p{color:var(--muted)}
 .todo-thumb span{position:relative;z-index:3;font:400 clamp(3.5rem,6vw,6rem)/.8 Georgia,serif;letter-spacing:-.08em}
 .todo-thumb i,.todo-thumb::after{content:"";position:absolute;border:1px solid rgba(255,255,255,.13);border-radius:50%}
 .todo-thumb i{width:62%;aspect-ratio:1}.todo-thumb::after{width:88%;aspect-ratio:1}
-.character-thumb img,.archive-thumb img{width:100%;height:100%;object-fit:cover;transition:transform 900ms var(--ease),filter 900ms var(--ease)}
+.archive-thumb img{width:100%;height:100%;object-fit:cover;transition:transform 900ms var(--ease),filter 900ms var(--ease)}
 .character-thumb{background:#0d1018}.character-thumb img{object-fit:contain;padding:28px;filter:saturate(.9)}
 .archive-thumb img{filter:saturate(.72) contrast(1.05)}
 .project-thumb:hover img{transform:scale(1.06);filter:saturate(1.08)}
@@ -1674,3 +1674,12 @@ body::after{
 .todo-thumb .preview-badge{position:absolute;right:16px;bottom:15px;z-index:4;padding:6px 9px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(5,6,8,.72);color:#f0d49b;font:800 .52rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;backdrop-filter:blur(10px)}
 .todo-thumb:hover .preview-badge{border-color:rgba(228,194,127,.38)}
 @media(max-width:800px){.todo-thumb{min-height:270px}.todo-thumb iframe{min-height:270px}}
+
+
+/* Previous portfolio live archive preview */
+.previous-portfolio-preview{min-height:560px;overflow:hidden;position:relative;border-radius:24px}
+.previous-portfolio-preview iframe{display:block;width:100%;height:560px;border:0;background:#080810;transform-origin:top center}
+.archive-thumb{overflow:hidden;position:relative}
+.archive-thumb iframe{display:block;width:100%;height:100%;min-height:360px;border:0;transform:scale(.82);transform-origin:top center;background:#080810;pointer-events:none}
+@media(max-width:800px){.previous-portfolio-preview{min-height:420px}.previous-portfolio-preview iframe{height:420px}.archive-thumb iframe{min-height:320px}}
+@media(prefers-reduced-motion:reduce){.previous-portfolio-preview iframe,.archive-thumb iframe{transition:none!important}}
