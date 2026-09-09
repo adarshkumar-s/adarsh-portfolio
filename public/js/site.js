@@ -7,6 +7,12 @@
     ["/stats", "Stats"], ["/contact", "Contact"]
   ];
 
+  const socialItems = [
+    ["LinkedIn", "https://www.linkedin.com/in/adarsh-kumar-1741273b2"],
+    ["WhatsApp", "https://wa.me/919313506135?text=Hi%20Adarsh,%20I%20saw%20your%20portfolio%20and%20wanted%20to%20connect!"],
+    ["GitHub", "https://github.com/adarshkumar-s"]
+  ];
+
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const currentPath = location.pathname.replace(/\/$/, "") || "/";
@@ -123,6 +129,18 @@
       link.textContent = label;
       links.appendChild(link);
     });
+
+    const socials = document.createElement("div");
+    socials.className = "footer-socials";
+    socialItems.forEach(([label, href]) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.textContent = label;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      socials.appendChild(link);
+    });
+    links.appendChild(socials);
 
     grid.append(identity, links);
 
