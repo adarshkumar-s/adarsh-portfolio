@@ -192,6 +192,8 @@
     const SVG_NS = "http://www.w3.org/2000/svg";
     const defs = svg.querySelector("defs");
 
+    /* The undisturbed source remains the sharp base. A duplicate of that exact
+       source is clipped to a small moving circle and receives the displacement. */
     const clipPath = document.createElementNS(SVG_NS, "clipPath");
     clipPath.id = "a-liquid-clip";
     const clipCircle = document.createElementNS(SVG_NS, "circle");
@@ -213,6 +215,8 @@
     liquidA.setAttribute("clip-path", "url(#a-liquid-clip)");
     liquidA.setAttribute("pointer-events", "none");
     svg.appendChild(liquidA);
+
+    /* The original image is never filtered; only the local liquid copy is. */
     baseA.removeAttribute("filter");
 
     let pointerInside = false;
@@ -231,6 +235,7 @@
     const addRipple = (x, y, strength) => {
       if (rippleCooldown > 0) return;
       rippleCooldown = 64;
+
       const circle = document.createElementNS(SVG_NS, "circle");
       circle.setAttribute("cx", (x * 640).toFixed(2));
       circle.setAttribute("cy", (y * 640).toFixed(2));
@@ -239,7 +244,10 @@
       circle._strength = Math.min(1.4, Math.max(.35, strength));
       circle._radius = 3;
       rippleGroup.appendChild(circle);
-      while (rippleGroup.childElementCount > 7) rippleGroup.firstElementChild.remove();
+
+      while (rippleGroup.childElementCount > 7) {
+        rippleGroup.firstElementChild.remove();
+      }
     };
 
     const animate = now => {
@@ -247,51 +255,89 @@
       const dt = Math.min(34, Math.max(8, now - lastTime));
       const step = dt / 16.67;
       lastTime = now;
+
       const follow = 1 - Math.pow(.001, dt / 220);
       const settle = 1 - Math.pow(.001, dt / 300);
+
       pointer.x += (targetPointer.x - pointer.x) * follow;
       pointer.y += (targetPointer.y - pointer.y) * follow;
       velocity += (targetVelocity - velocity) * .18;
       energy += (targetEnergy - energy) * settle;
+
       targetVelocity *= Math.pow(.68, dt / 16.67);
       targetEnergy *= Math.pow(.72, dt / 16.67);
       rippleCooldown = Math.max(0, rippleCooldown - dt);
+
       const px = pointer.x * 640;
       const py = pointer.y * 640;
       const radius = 92 + energy * 54;
+
       clipCircle.setAttribute("cx", px.toFixed(2));
       clipCircle.setAttribute("cy", py.toFixed(2));
       clipCircle.setAttribute("r", radius.toFixed(2));
+
       stage.style.setProperty("--a-x", (pointer.x * 100).toFixed(2) + "%");
       stage.style.setProperty("--a-y", (pointer.y * 100).toFixed(2) + "%");
+
+      /* Local displacement is driven by velocity and decays like a soft spring. */
       const displacementScale = Math.min(13.5, energy * 7.5 + velocity * 5.5);
       displacement.setAttribute("scale", displacementScale.toFixed(2));
-      noise.setAttribute("baseFrequency", (0.008 + energy * 0.006).toFixed(4) + " " + (0.018 + energy * 0.010).toFixed(4));
+      noise.setAttribute(
+        "baseFrequency",
+        (0.008 + energy * 0.006).toFixed(4) + " " +
+        (0.018 + energy * 0.010).toFixed(4)
+      );
       noise.setAttribute("seed", String(12 + Math.round(energy * 9)));
+
       liquidA.style.opacity = String(Math.min(1, .78 + energy * .3));
+
       for (const circle of rippleGroup.children) {
         circle._radius += (.5 + circle._strength * .65) * step;
         circle._life -= .024 * step;
         circle.setAttribute("r", circle._radius.toFixed(2));
         circle.setAttribute("opacity", Math.max(0, circle._life * .42).toFixed(3));
       }
-      while (rippleGroup.firstElementChild && Number(rippleGroup.firstElementChild.getAttribute("opacity")) <= 0) rippleGroup.firstElementChild.remove();
-      if (pointerInside || energy > .008 || rippleGroup.childElementCount) raf = requestAnimationFrame(animate);
+
+      while (
+        rippleGroup.firstElementChild &&
+        Number(rippleGroup.firstElementChild.getAttribute("opacity")) <= 0
+      ) {
+        rippleGroup.firstElementChild.remove();
+      }
+
+      if (pointerInside || energy > .008 || rippleGroup.childElementCount) {
+        raf = requestAnimationFrame(animate);
+      }
     };
 
     const startAnimation = () => {
-      if (!raf) { lastTime = performance.now(); raf = requestAnimationFrame(animate); }
+      if (!raf) {
+        lastTime = performance.now();
+        raf = requestAnimationFrame(animate);
+      }
     };
+
     const localPoint = event => {
       const rect = stage.getBoundingClientRect();
-      return { x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)), y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height)) };
+      return {
+        x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)),
+        y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height))
+      };
     };
+
     stage.addEventListener("pointerenter", event => {
       pointerInside = true;
       const p = localPoint(event);
-      targetPointer = p; pointer = p; lastPointer = p; lastPointerTime = performance.now();
-      targetVelocity = .2; targetEnergy = .34; addRipple(p.x, p.y, .6); startAnimation();
+      targetPointer = p;
+      pointer = p;
+      lastPointer = p;
+      lastPointerTime = performance.now();
+      targetVelocity = .2;
+      targetEnergy = .34;
+      addRipple(p.x, p.y, .6);
+      startAnimation();
     }, { passive: true });
+
     stage.addEventListener("pointermove", event => {
       const p = localPoint(event);
       const now = performance.now();
@@ -299,12 +345,23 @@
       const dx = (p.x - lastPointer.x) * stage.clientWidth;
       const dy = (p.y - lastPointer.y) * stage.clientHeight;
       const speed = Math.min(1.5, Math.hypot(dx, dy) / elapsed);
-      targetPointer = p; targetVelocity = speed; targetEnergy = Math.min(1.15, .12 + speed * 2.6);
+
+      targetPointer = p;
+      targetVelocity = speed;
+      targetEnergy = Math.min(1.15, .12 + speed * 2.6);
+
       if (speed > .035) addRipple(p.x, p.y, .45 + speed * 1.8);
-      lastPointer = p; lastPointerTime = now; startAnimation();
+
+      lastPointer = p;
+      lastPointerTime = now;
+      startAnimation();
     }, { passive: true });
+
     stage.addEventListener("pointerleave", () => {
-      pointerInside = false; targetVelocity = 0; targetEnergy = 0; startAnimation();
+      pointerInside = false;
+      targetVelocity = 0;
+      targetEnergy = 0;
+      startAnimation();
     }, { passive: true });
   }
 
@@ -312,15 +369,23 @@
   if (!reduceMotion && finePointer) {
     document.querySelectorAll(".tilt-card").forEach(card => {
       let frame = 0;
-      let rx = 0, ry = 0;
-      let targetRx = 0, targetRy = 0;
+      let rx = 0;
+      let ry = 0;
+      let targetRx = 0;
+      let targetRy = 0;
+
       const render = () => {
         frame = 0;
         rx += (targetRx - rx) * .13;
         ry += (targetRy - ry) * .13;
-        card.style.transform = "perspective(1200px) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) translateY(-3px)";
-        if (Math.abs(targetRx - rx) > .01 || Math.abs(targetRy - ry) > .01) frame = requestAnimationFrame(render);
+        card.style.transform =
+          "perspective(1200px) rotateX(" + rx.toFixed(2) +
+          "deg) rotateY(" + ry.toFixed(2) + "deg) translateY(-3px)";
+        if (Math.abs(targetRx - rx) > .01 || Math.abs(targetRy - ry) > .01) {
+          frame = requestAnimationFrame(render);
+        }
       };
+
       card.addEventListener("pointermove", event => {
         const rect = card.getBoundingClientRect();
         const px = (event.clientX - rect.left) / rect.width;
@@ -331,8 +396,11 @@
         card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
         if (!frame) frame = requestAnimationFrame(render);
       }, { passive: true });
+
       card.addEventListener("pointerleave", () => {
-        targetRx = 0; targetRy = 0; if (!frame) frame = requestAnimationFrame(render);
+        targetRx = 0;
+        targetRy = 0;
+        if (!frame) frame = requestAnimationFrame(render);
       }, { passive: true });
     });
   }
@@ -343,15 +411,18 @@
     const originalCards = Array.from(projectRail.children);
     const gap = parseFloat(getComputedStyle(projectRail).columnGap || getComputedStyle(projectRail).gap || "0") || 0;
     originalCards.forEach(card => projectRail.appendChild(card.cloneNode(true)));
+
     let loopWidth = 0;
     let offset = 0;
     let lastTime = performance.now();
     let railFrame = 0;
     const speed = 34;
+
     const measureLoop = () => {
       loopWidth = originalCards.reduce((total, card) => total + card.getBoundingClientRect().width, 0) + gap * Math.max(0, originalCards.length - 1);
       if (loopWidth > 0) offset = ((offset % loopWidth) + loopWidth) % loopWidth;
     };
+
     const tick = now => {
       const dt = Math.min(40, Math.max(8, now - lastTime));
       lastTime = now;
@@ -362,11 +433,12 @@
       }
       railFrame = requestAnimationFrame(tick);
     };
+
     measureLoop();
     window.addEventListener("resize", measureLoop, { passive: true });
     railFrame = requestAnimationFrame(tick);
   }
-
+  
   /* ---------- desktop cursor with context-aware states ---------- */
   if (!reduceMotion && finePointer) {
     const cursor = document.createElement("div");
@@ -374,39 +446,51 @@
     cursor.setAttribute("aria-hidden", "true");
     document.body.appendChild(cursor);
     document.body.classList.add("has-custom-cursor");
+
     let targetX = -80;
     let targetY = -80;
     let x = -80;
     let y = -80;
     let frame = 0;
+
     const render = () => {
       frame = 0;
       x += (targetX - x) * .19;
       y += (targetY - y) * .19;
-      cursor.style.transform = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) translate(-50%,-50%)";
-      if (Math.abs(targetX - x) > .1 || Math.abs(targetY - y) > .1) frame = requestAnimationFrame(render);
+      cursor.style.transform =
+        "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) translate(-50%,-50%)";
+      if (Math.abs(targetX - x) > .1 || Math.abs(targetY - y) > .1) {
+        frame = requestAnimationFrame(render);
+      }
     };
+
     document.addEventListener("pointermove", event => {
       targetX = event.clientX;
       targetY = event.clientY;
       cursor.style.opacity = "1";
       if (!frame) frame = requestAnimationFrame(render);
     }, { passive: true });
+
     document.addEventListener("pointerover", event => {
       const target = event.target.closest?.("[data-cursor-label], .button, .text-link, .hero-a-stage");
       if (!target) return;
+
       cursor.classList.remove("is-link", "is-project", "is-a");
+
       if (target.classList.contains("hero-a-stage")) {
         cursor.classList.add("is-a");
         return;
       }
+
       if (target.dataset.cursorLabel) {
         cursor.classList.add("is-project");
         cursor.dataset.label = target.dataset.cursorLabel;
         return;
       }
+
       cursor.classList.add("is-link");
     }, { passive: true });
+
     document.addEventListener("pointerout", event => {
       const target = event.target.closest?.("[data-cursor-label], .button, .text-link, .hero-a-stage");
       if (!target || target.contains(event.relatedTarget)) return;
