@@ -19,11 +19,12 @@ const ROUTES = new Map([
   ["/tools/json", "tools/json/index.html"],
   ["/tools/image-optimizer", "tools/image-optimizer/index.html"],
   ["/tools/gradient-generator", "tools/gradient-generator/index.html"],
+  ["/tools/file-converter", "tools/file-converter/index.html"],
   ["/archive/previous-portfolio", "archive/previous-portfolio/index.html"]
 ]);
 
 const MIME_TYPES = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".json":"application/json; charset=utf-8",".svg":"image/svg+xml",".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".avif":"image/avif",".txt":"text/plain; charset=utf-8",".xml":"application/xml; charset=utf-8"};
-const SECURITY_HEADERS = {"X-Content-Type-Options":"nosniff","X-Frame-Options":"SAMEORIGIN","Referrer-Policy":"strict-origin-when-cross-origin","Permissions-Policy":"camera=(), microphone=(), geolocation=()","Content-Security-Policy":"default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"};
+const SECURITY_HEADERS = {"X-Content-Type-Options":"nosniff","X-Frame-Options":"SAMEORIGIN","Referrer-Policy":"strict-origin-when-cross-origin","Permissions-Policy":"camera=(), microphone=(), geolocation=()","Content-Security-Policy":"default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"};
 
 function safePath(requestPath) {
   try {

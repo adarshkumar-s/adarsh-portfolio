@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Convert supported documents, images and spreadsheets directly in your browser with Adarsh Kumar's File Converter.">
+<meta name="theme-color" content="#07080c">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'">
+<title>File Converter — Adarsh Kumar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/adarsh-a-favicon.svg">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/labs-tools.css">
+<link rel="stylesheet" href="/css/file-converter.css">
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+<header class="detail-hero shell converter-hero">
+  <div class="converter-kicker"><span class="eyebrow">TOOL / FILE CONVERTER 04</span><a class="back-link" href="/tools">← All tools</a></div>
+  <h1>Files in.<br><em>Useful formats out.</em></h1>
+  <p class="detail-lede">Convert supported documents, images and spreadsheets without leaving the portfolio. Files are processed in your browser; they are not uploaded to a conversion server.</p>
+</header>
+<section class="section shell">
+  <div class="converter-shell">
+    <div class="converter-main">
+      <label class="converter-dropzone" id="dropzone" for="fileInput">
+        <input id="fileInput" type="file" multiple aria-describedby="supportNote">
+        <span class="converter-drop-icon" aria-hidden="true">↥</span>
+        <strong>Drop files here</strong>
+        <span>or choose files from your device</span>
+        <small id="supportNote">PDF, images, TXT, DOCX, CSV and XLSX are accepted. Maximum 25 MB per file.</small>
+      </label>
+      <section class="converter-card" aria-labelledby="selected-file-title">
+        <div class="converter-card-head">
+          <div><span class="eyebrow">STEP 01</span><h2 id="selected-file-title">Selected files</h2></div>
+          <span class="converter-status-chip">LOCAL</span>
+        </div>
+        <div id="fileList" class="converter-file-list" hidden></div>
+        <p class="converter-empty" id="fileEmpty">Nothing selected yet. Choose a file to unlock compatible output formats.</p>
+      </section>
+      <section class="converter-card" aria-labelledby="conversion-title">
+        <div class="converter-card-head">
+          <div><span class="eyebrow">STEP 02</span><h2 id="conversion-title">Choose output</h2></div>
+          <span class="converter-status-chip">VERIFIED MATRIX</span>
+        </div>
+        <div class="converter-controls">
+          <div class="converter-option">
+            <label for="targetFormat">Convert to</label>
+            <select id="targetFormat" disabled aria-describedby="conversionHelp"></select>
+            <small id="conversionHelp">Only conversions implemented by this tool are shown.</small>
+          </div>
+          <div id="converterOptions" class="converter-options"></div>
+        </div>
+        <div class="converter-action-row">
+          <button class="small-button primary converter-button" id="convertButton" type="button" disabled>Convert file</button>
+          <button class="small-button" id="resetConverter" type="button">Reset</button>
+        </div>
+      </section>
+      <section class="converter-progress" aria-live="polite">
+        <div class="converter-progress-head"><span>PROCESSING</span><strong id="progressLabel">Ready</strong></div>
+        <div class="converter-progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+        <p id="converterStatus" class="tool-status" role="status">Drop files here or choose files to begin.</p>
+      </section>
+      <section class="converter-result" id="converterResult" hidden aria-labelledby="result-title">
+        <div class="converter-result-icon" aria-hidden="true">✓</div>
+        <div>
+          <span class="eyebrow">CONVERSION COMPLETE</span>
+          <h2 id="result-title"><span id="resultName">converted-file</span></h2>
+          <p id="resultMeta">Ready to download.</p>
+        </div>
+        <button class="small-button primary" id="downloadResult" type="button">Download</button>
+      </section>
+    </div>
+    <aside class="converter-side">
+      <div class="converter-side-card">
+        <span class="eyebrow">SUPPORTED</span>
+        <h2>Honest by design.</h2>
+        <p>This tool only exposes conversions backed by browser-compatible conversion engines. Advanced office-to-PDF conversions are intentionally not advertised because this static deployment does not include LibreOffice.</p>
+        <div class="converter-matrix">
+          <div><b>PDF</b><span>DOCX · TXT · JPG · PNG</span></div>
+          <div><b>Images</b><span>JPG · PNG · WEBP · PDF</span></div>
+          <div><b>DOCX</b><span>TXT · HTML</span></div>
+          <div><b>TXT</b><span>DOCX · PDF</span></div>
+          <div><b>CSV</b><span>XLSX</span></div>
+          <div><b>XLSX</b><span>CSV · one sheet at a time</span></div>
+        </div>
+      </div>
+      <div class="converter-side-card converter-privacy">
+        <span class="eyebrow">PRIVACY</span>
+        <h2>Your file stays here.</h2>
+        <p>Conversion happens in your browser. No upload endpoint, database, account, paid API or external conversion service is used. Small open-source libraries are loaded from jsDelivr when a conversion needs them.</p>
+      </div>
+      <div class="converter-side-card">
+        <span class="eyebrow">LIMITS</span>
+        <h2>Know the trade-offs.</h2>
+        <ul>
+          <li>25 MB maximum per input file.</li>
+          <li>PDF → DOCX is text-first, not pixel-perfect.</li>
+          <li>Scanned PDFs are detected when no selectable text is found; OCR reconstruction is not claimed.</li>
+          <li>Animated GIF input converts as its first decoded frame.</li>
+          <li>Workbook sheets are never silently merged.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</section>
+<section class="platform-band" aria-label="File converter privacy">
+  <div class="shell platform-band-inner">
+    <span class="eyebrow">BROWSER-FIRST UTILITY</span>
+    <p>No conversion server is involved. Your files are held temporarily by this page and released when you leave or reset the tool.</p>
+  </div>
+</section>
+</main>
+<div id="site-footer"></div>
+<script src="/js/site.js" defer></script>
+<script src="/js/tool-converter.js" defer></script>
+</body>
+</html>

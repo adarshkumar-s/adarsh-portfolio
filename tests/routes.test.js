@@ -7,7 +7,7 @@ const {spawn, execFileSync} = require("child_process");
 const routes = [
   "/", "/projects", "/projects/anshika-studio", "/projects/previous-portfolio", "/projects/sih-2026",
   "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground",
-  "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/stack",
+  "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/tools/file-converter", "/stack",
   "/blog", "/about", "/contact", "/stats", "/archive/previous-portfolio"
 ];
 
@@ -18,7 +18,8 @@ const requiredFiles = [
   "public/todo-app/index.html", "public/css/todo.css", "public/js/todo.js",
   "public/labs/index.html", "public/labs/liquid-interaction/index.html", "public/labs/magnetic-ui/index.html",
   "public/labs/scroll-playground/index.html", "public/tools/index.html", "public/tools/json/index.html",
-  "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/stack/index.html",
+  "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/tools/file-converter/index.html",
+  "public/css/file-converter.css", "public/js/tool-converter.js", "public/stack/index.html",
   "server.js", "vercel.json", "SECURITY.md", ".github/dependabot.yml", ".github/workflows/test.yml", ".github/workflows/deploy-pages.yml"
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(root, file)), file + " should exist"));
@@ -28,7 +29,8 @@ assert.ok(!fs.existsSync(path.join(root, "public/Doraemon.png")));
 const jsFiles = [
   "public/js/site.js", "public/js/contact.js", "public/js/tools.js",
   "public/js/lab-liquid.js", "public/js/lab-magnetic.js", "public/js/lab-scroll.js",
-  "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js", "public/js/todo.js"
+  "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js",
+  "public/js/tool-converter.js", "public/js/todo.js"
 ];
 jsFiles.forEach(file => execFileSync(process.execPath, ["--check", path.join(root, file)], {stdio: "pipe"}));
 
@@ -76,6 +78,24 @@ const tools = fs.readFileSync(path.join(root, "public/tools/index.html"), "utf8"
 assert.match(tools, /JSON Formatter/);
 assert.match(tools, /Image Optimizer/);
 assert.match(tools, /Gradient Generator/);
+assert.match(tools, /File Converter/);
+assert.match(tools, /\/tools\/file-converter/);
+
+const converter = fs.readFileSync(path.join(root, "public/tools/file-converter/index.html"), "utf8");
+assert.match(converter, /Drop files here/);
+assert.match(converter, /Files are processed in your browser/);
+assert.match(converter, /PDF → DOCX/);
+assert.match(converter, /CSV/);
+assert.match(converter, /25 MB/);
+assert.doesNotMatch(converter, /upload endpoint|conversion server/gi);
+
+const converterJs = fs.readFileSync(path.join(root, "public/js/tool-converter.js"), "utf8");
+for (const capability of ["pdf-docx","pdf-txt","pdf-jpg","pdf-png","image-jpg","image-png","image-webp","image-pdf","txt-docx","txt-pdf","docx-txt","docx-html","csv-xlsx","xlsx-csv"]) {
+  assert.match(converterJs, new RegExp(capability.replace("-", "\\-")));
+}
+assert.match(converterJs, /MAX_BYTES=25\*1024\*1024/);
+assert.match(converterJs, /safeBase/);
+assert.doesNotMatch(converterJs, /fetch\\([^)]*file|FormData/);
 
 const projects = fs.readFileSync(path.join(root, "public/projects/index.html"), "utf8");
 assert.match(projects, /Anshika Studio/);
@@ -95,6 +115,7 @@ for (const route of routes) assert.ok(rewriteSources.has(route), "missing Vercel
 assert.ok(!rewriteSources.has("/projects/character-gallery"));
 assert.ok(!rewriteSources.has("/projects/todo-app"));
 assert.ok(!rewriteSources.has("/todo"));
+assert.match(vercel.headers[0].headers.find(h => h.key === "Content-Security-Policy").value, /cdn\.jsdelivr\.net/);
 
 const child = spawn(process.execPath, ["server.js"], {env: {...process.env, PORT: "3219"}});
 const get = route => new Promise((resolve, reject) => {
@@ -114,9 +135,8 @@ const get = route => new Promise((resolve, reject) => {
       assert.strictEqual(res.status, 200, route + " should return 200");
       assert.match(res.headers["content-type"], /text\/html/);
       assert.strictEqual(res.headers["x-content-type-options"], "nosniff");
-      assert.match(res.headers["content-security-policy"], /default-src 'self'/);
+      assert.match(res.headers["content-security-policy"], /cdn\.jsdelivr\.net/);
     }
-
     assert.strictEqual((await get("/projects/character-gallery")).status, 404);
     assert.strictEqual((await get("/projects/todo-app")).status, 404);
     assert.strictEqual((await get("/todo")).status, 404);
@@ -125,7 +145,6 @@ const get = route => new Promise((resolve, reject) => {
     assert.doesNotMatch(missing.body, /Error:|at .*server\.js|\/.*server\.js/);
     assert.strictEqual((await get("/../../package.json")).status, 404);
     assert.strictEqual((await get("/%E0%A4%A")).status, 404);
-
     const method = await new Promise((resolve, reject) => {
       const req = http.request("http://127.0.0.1:3219/", {method: "POST"}, res => {
         res.resume();
@@ -135,7 +154,7 @@ const get = route => new Promise((resolve, reject) => {
       req.end();
     });
     assert.strictEqual(method, 405);
-    console.log("Route, security-header, stale-reference, Vercel-rewrite, visual-preservation, static-entry, 404, traversal, malformed-request, method and syntax tests passed.");
+    console.log("Route, converter, security-header, stale-reference, Vercel-rewrite, visual-preservation, static-entry, 404, traversal, malformed-request, method and syntax tests passed.");
   } finally {
     child.kill();
   }
