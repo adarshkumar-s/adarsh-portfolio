@@ -16,7 +16,7 @@ let files=[],resultBlob=null,resultName="",sourceKind="",workbook=null;
 const lib={};
 const LIBS={
   pdfjs:["https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",()=>window.pdfjsLib],
-  docx:["https://cdn.jsdelivr.net/npm/docx@9.7.1/build/index.js",()=>window.docx],
+  docx:["https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js",()=>window.docx],
   jspdf:["https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js",()=>window.jspdf&&window.jspdf.jsPDF],
   xlsx:["https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",()=>window.XLSX],
   mammoth:["https://cdn.jsdelivr.net/npm/mammoth@1.12.2/mammoth.browser.min.js",()=>window.mammoth],
@@ -98,13 +98,13 @@ async function extractPdf(file,pages,onProgress){
   }
   return {pdf,pages,text:parts.join("\n\n")};
 }
-async function imageBlob(file,target,quality){
+async function imageBlob(file,target,quality,background){
   const img=new Image(),url=URL.createObjectURL(file);
   try{
     await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error("The browser could not decode this image."));img.src=url;});
     const canvas=document.createElement("canvas");canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;const ctx=canvas.getContext("2d");
     if(!ctx)throw Error("Canvas encoding is unavailable in this browser.");
-    if(target==="image/jpeg"){ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);}
+    if(target==="image/jpeg"){ctx.fillStyle=background==="black"?"#000":"#fff";ctx.fillRect(0,0,canvas.width,canvas.height);}
     ctx.drawImage(img,0,0);
     return await new Promise(resolve=>canvas.toBlob(resolve,target,target==="image/png"?undefined:quality));
   }finally{URL.revokeObjectURL(url);}
@@ -220,7 +220,7 @@ async function run(){
       if(files.some(f=>kind(f)!=="image"))throw Error("Only image files can be combined into a PDF.");
       output={name:base+"-images.pdf",blob:await imageToPdf(files)};
     }else if(/^image-(jpg|png|webp)$/.test(id)){
-      const targetMime={"image-jpg":"image/jpeg","image-png":"image/png","image-webp":"image/webp"}[id],q=Number($("imageQuality")?.value||90)/100,blob=await imageBlob(files[0],targetMime,q);
+      const targetMime={"image-jpg":"image/jpeg","image-png":"image/png","image-webp":"image/webp"}[id],q=Number($("imageQuality")?.value||90)/100,blob=await imageBlob(files[0],targetMime,q,$("jpegBackground")?.value||"white");
       if(!blob)throw Error("This browser could not encode the requested image format.");
       if(files[0].type==="image/gif")setStatus("Done. Animated GIFs are converted as their first decoded frame; animation is not preserved.");
       output={name:base+"."+targetExt,blob};
