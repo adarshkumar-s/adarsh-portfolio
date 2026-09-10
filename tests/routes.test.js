@@ -5,16 +5,16 @@ const http = require("http");
 const {spawn, execFileSync} = require("child_process");
 
 const routes = [
-  "/", "/projects", "/projects/anshika-studio", "/projects/todo-app", "/projects/previous-portfolio", "/projects/sih-2026",
+  "/", "/projects", "/projects/anshika-studio", "/projects/previous-portfolio", "/projects/sih-2026",
   "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground",
   "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/stack",
-  "/blog", "/about", "/contact", "/stats", "/todo", "/archive/previous-portfolio"
+  "/blog", "/about", "/contact", "/stats", "/archive/previous-portfolio"
 ];
 
 const root = path.join(__dirname, "..");
 const requiredFiles = [
-  "public/index.html", "public/projects/index.html", "public/projects/todo-app.html",
-  "public/projects/previous-portfolio.html", "public/todo-app/index.html", "public/archive/previous-portfolio/index.html",
+  "public/index.html", "public/projects/index.html",
+  "public/projects/previous-portfolio.html", "public/projects/sih-2026.html", "public/archive/previous-portfolio/index.html",
   "public/labs/index.html", "public/labs/liquid-interaction/index.html", "public/labs/magnetic-ui/index.html",
   "public/labs/scroll-playground/index.html", "public/tools/index.html", "public/tools/json/index.html",
   "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/stack/index.html",
@@ -22,10 +22,14 @@ const requiredFiles = [
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(root, file)), file + " should exist"));
 assert.ok(!fs.existsSync(path.join(root, "public/projects/character-gallery.html")));
+assert.ok(!fs.existsSync(path.join(root, "public/projects/todo-app.html")));
+assert.ok(!fs.existsSync(path.join(root, "public/todo-app")));
+assert.ok(!fs.existsSync(path.join(root, "public/js/todo.js")));
+assert.ok(!fs.existsSync(path.join(root, "public/css/todo.css")));
 assert.ok(!fs.existsSync(path.join(root, "public/Doraemon.png")));
 
 const jsFiles = [
-  "public/js/site.js", "public/js/todo.js", "public/js/contact.js", "public/js/tools.js",
+  "public/js/site.js", "public/js/contact.js", "public/js/tools.js",
   "public/js/lab-liquid.js", "public/js/lab-magnetic.js", "public/js/lab-scroll.js",
   "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js"
 ];
@@ -45,7 +49,7 @@ function collectCurrentSurface(dir) {
 }
 collectCurrentSurface(root);
 for (const [file, text] of currentSurfaceText) {
-  assert.doesNotMatch(text, /Character Gallery|character-gallery|Task Tracker|Experiment slot|premium-portfolio/,
+  assert.doesNotMatch(text, /Character Gallery|character-gallery|Task Tracker|Experiment slot|premium-portfolio|Todo App|todo-app|\/todo\b|todo\.js|todo\.css/i,
     "obsolete current-surface reference in " + path.relative(root, file));
 }
 
@@ -53,9 +57,9 @@ const homepage = fs.readFileSync(path.join(root, "public/index.html"), "utf8");
 assert.match(homepage, /hero-quote/);
 assert.match(homepage, /data-infinite-project-rail/);
 assert.match(homepage, /Anshika Studio/);
-assert.match(homepage, /Todo App/);
 assert.match(homepage, /Previous Portfolio/);
 assert.match(homepage, /SIH 2026/);
+assert.doesNotMatch(homepage, /Todo App|todo-app|\/todo\b/i);
 assert.doesNotMatch(homepage, /Character Gallery|character-gallery/);
 
 const mainCss = fs.readFileSync(path.join(root, "public/css/main.css"), "utf8");
@@ -78,36 +82,17 @@ assert.match(tools, /Gradient Generator/);
 
 const projects = fs.readFileSync(path.join(root, "public/projects/index.html"), "utf8");
 assert.match(projects, /Anshika Studio/);
-assert.match(projects, /Todo App/);
 assert.match(projects, /SIH 2026/);
 assert.match(projects, /Previous portfolio preview/);
+assert.doesNotMatch(projects, /Todo App|todo-app|\/todo\b/i);
 assert.doesNotMatch(projects, /Character Gallery|character-gallery/);
-
-const todo = fs.readFileSync(path.join(root, "public/todo-app/index.html"), "utf8");
-const todoJs = fs.readFileSync(path.join(root, "public/js/todo.js"), "utf8");
-assert.match(todo, /searchInput/);
-assert.match(todo, /data-filter="active"/);
-assert.match(todo, /data-filter="completed"/);
-assert.match(todo, /sortSelect/);
-assert.match(todo, /priorityInput/);
-assert.match(todo, /categoryInput/);
-assert.match(todo, /dueDateInput/);
-assert.match(todoJs, /localStorage/);
-assert.match(todoJs, /editTask/);
-assert.match(todoJs, /completed = !task\.completed/);
-assert.match(todoJs, /tasks = tasks\.filter\(entry => entry\.id !== task\.id\)/);
-assert.match(todoJs, /markAll/);
-assert.match(todoJs, /clearCompleted/);
-
-const imageTool = fs.readFileSync(path.join(root, "public/js/tool-image.js"), "utf8");
-assert.match(imageTool, /image\/gif/);
-assert.match(imageTool, /type === "image\/gif" \? "GIF"/);
-assert.match(imageTool, /URL\.createObjectURL/);
 
 const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
 const rewriteSources = new Set(vercel.rewrites.map(item => item.source));
 for (const route of routes) assert.ok(rewriteSources.has(route), "missing Vercel rewrite: " + route);
 assert.ok(!rewriteSources.has("/projects/character-gallery"));
+assert.ok(!rewriteSources.has("/projects/todo-app"));
+assert.ok(!rewriteSources.has("/todo"));
 
 const child = spawn(process.execPath, ["server.js"], {env: {...process.env, PORT: "3219"}});
 const get = route => new Promise((resolve, reject) => {
@@ -131,6 +116,8 @@ const get = route => new Promise((resolve, reject) => {
     }
 
     assert.strictEqual((await get("/projects/character-gallery")).status, 404);
+    assert.strictEqual((await get("/projects/todo-app")).status, 404);
+    assert.strictEqual((await get("/todo")).status, 404);
     const missing = await get("/does-not-exist");
     assert.strictEqual(missing.status, 404);
     assert.doesNotMatch(missing.body, /Error:|at .*server\.js|\/.*server\.js/);
@@ -146,7 +133,7 @@ const get = route => new Promise((resolve, reject) => {
       req.end();
     });
     assert.strictEqual(method, 405);
-    console.log("Route, security-header, stale-reference, Vercel-rewrite, visual-preservation, Todo, image-format, 404, traversal, malformed-request, method and syntax tests passed.");
+    console.log("Route, security-header, stale-reference, Vercel-rewrite, visual-preservation, Todo-removal, 404, traversal, malformed-request, method and syntax tests passed.");
   } finally {
     child.kill();
   }
