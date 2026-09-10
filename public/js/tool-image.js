@@ -21,7 +21,7 @@
   let optimizedBlob = null;
   let image = null;
 
-  const formatName = type => type === "image/webp" ? "WebP" : type === "image/png" ? "PNG" : "JPEG";
+  const formatName = type => type === "image/webp" ? "WebP" : type === "image/png" ? "PNG" : type === "image/gif" ? "GIF" : type === "image/jpeg" ? "JPEG" : (type ? type.replace(/^image\//, "").toUpperCase() : "Unknown");
   const size = bytes => {
     if (!bytes) return "—";
     const units = ["B", "KB", "MB"];
