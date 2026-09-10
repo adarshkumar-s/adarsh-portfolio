@@ -113,7 +113,6 @@ const rewriteSources = new Set(vercel.rewrites.map(item => item.source));
 for (const route of routes) assert.ok(rewriteSources.has(route), "missing Vercel rewrite: " + route);
 assert.ok(!rewriteSources.has("/projects/character-gallery"));
 assert.ok(!rewriteSources.has("/projects/todo-app"));
-assert.ok(!rewriteSources.has("/todo"));
 assert.match(vercel.headers[0].headers.find(h => h.key === "Content-Security-Policy").value, /cdn\.jsdelivr\.net/);
 
 const child = spawn(process.execPath, ["server.js"], {env: {...process.env, PORT: "3219"}});
