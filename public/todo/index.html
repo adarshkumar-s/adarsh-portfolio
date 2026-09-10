@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08090d">
+<meta name="description" content="TaskFlow — a fast, polished browser todo app by Adarsh Kumar.">
+<title>TaskFlow — Todo App | Adarsh Kumar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/adarsh-a-favicon.svg">
+<link rel="stylesheet" href="/css/todo.css">
+</head>
+<body>
+<main class="todo-wrap">
+  <nav class="topbar"><a class="back" href="/projects/">← Projects</a><span class="brand">TASKFLOW</span></nav>
+  <section class="todo-app" aria-labelledby="todo-title">
+    <header class="hero">
+      <div><span class="eyebrow">BROWSER APP / LOCAL-FIRST</span><h1 id="todo-title">Get things done.</h1><p>Capture tasks, set priorities, stay focused. Everything is saved in your browser.</p></div>
+      <div class="stats" aria-label="Task statistics"><div><strong id="totalCount">0</strong><span>Total</span></div><div><strong id="activeCount">0</strong><span>Active</span></div><div><strong id="completedCount">0</strong><span>Done</span></div></div>
+    </header>
+    <form id="todoForm" class="composer" novalidate>
+      <label class="sr-only" for="todoInput">New task</label><input id="todoInput" type="text" maxlength="180" placeholder="What needs to be done?" autocomplete="off" required>
+      <select id="priorityInput" aria-label="Priority"><option value="normal">Normal</option><option value="high">High priority</option><option value="low">Low priority</option></select>
+      <input id="dueDateInput" type="date" aria-label="Due date"><button class="add-button" type="submit">Add task <span aria-hidden="true">↗</span></button>
+    </form>
+    <div class="toolbar">
+      <label class="search"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search tasks…" aria-label="Search tasks"></label>
+      <div class="filters" role="group" aria-label="Filter tasks"><button type="button" class="active" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="active" aria-pressed="false">Active</button><button type="button" data-filter="completed" aria-pressed="false">Completed</button></div>
+      <select id="sortSelect" aria-label="Sort tasks"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="priority">Priority</option><option value="due">Due date</option><option value="alpha">A–Z</option></select>
+    </div>
+    <div class="bulk"><span id="resultLabel">Your tasks</span><div><button id="markAll" type="button">Complete all</button><button id="clearCompleted" type="button">Clear done</button></div></div>
+    <div id="emptyState" class="empty" hidden><span>✓</span><strong>No tasks found</strong><small>Add your first task or adjust the filter.</small></div>
+    <ul id="todoList" aria-live="polite" aria-label="Tasks"></ul>
+  </section>
+  <footer>TaskFlow · Data stays in this browser via localStorage.</footer>
+</main>
+<script src="/js/todo.js" defer></script>
+</body>
+</html>
