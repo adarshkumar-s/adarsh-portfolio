@@ -5,7 +5,7 @@ const http = require("http");
 const {spawn, execFileSync} = require("child_process");
 
 const routes = [
-  "/", "/projects", "/projects/anshika-studio", "/projects/todo-app", "/projects/previous-portfolio",
+  "/", "/projects", "/projects/anshika-studio", "/projects/todo-app", "/projects/previous-portfolio", "/projects/sih-2026",
   "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground",
   "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/stack",
   "/blog", "/about", "/contact", "/stats", "/todo", "/archive/previous-portfolio"
@@ -18,7 +18,7 @@ const requiredFiles = [
   "public/labs/index.html", "public/labs/liquid-interaction/index.html", "public/labs/magnetic-ui/index.html",
   "public/labs/scroll-playground/index.html", "public/tools/index.html", "public/tools/json/index.html",
   "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/stack/index.html",
-  "server.js", "vercel.json", "SECURITY.md", ".github/workflows/test.yml"
+  "server.js", "vercel.json", "SECURITY.md", ".github/dependabot.yml", ".github/workflows/test.yml"
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(root, file)), file + " should exist"));
 assert.ok(!fs.existsSync(path.join(root, "public/projects/character-gallery.html")));
@@ -49,6 +49,22 @@ for (const [file, text] of currentSurfaceText) {
     "obsolete current-surface reference in " + path.relative(root, file));
 }
 
+const homepage = fs.readFileSync(path.join(root, "public/index.html"), "utf8");
+assert.match(homepage, /hero-quote/);
+assert.match(homepage, /data-infinite-project-rail/);
+assert.match(homepage, /Anshika Studio/);
+assert.match(homepage, /Todo App/);
+assert.match(homepage, /Previous Portfolio/);
+assert.match(homepage, /SIH 2026/);
+assert.doesNotMatch(homepage, /Character Gallery|character-gallery/);
+
+const mainCss = fs.readFileSync(path.join(root, "public/css/main.css"), "utf8");
+assert.match(mainCss, /\.hero-quote/);
+assert.match(mainCss, /\.footer-socials/);
+assert.match(mainCss, /\[data-infinite-project-rail\]/);
+assert.match(mainCss, /\.custom-cursor/);
+assert.match(mainCss, /\.hero-a-stage/);
+
 const labs = fs.readFileSync(path.join(root, "public/labs/index.html"), "utf8");
 assert.match(labs, /Liquid Interaction/);
 assert.match(labs, /Magnetic UI/);
@@ -73,10 +89,20 @@ assert.match(todo, /searchInput/);
 assert.match(todo, /data-filter="active"/);
 assert.match(todo, /data-filter="completed"/);
 assert.match(todo, /sortSelect/);
+assert.match(todo, /priorityInput/);
+assert.match(todo, /categoryInput/);
+assert.match(todo, /dueDateInput/);
 assert.match(todoJs, /localStorage/);
 assert.match(todoJs, /editTask/);
 assert.match(todoJs, /completed = !task\.completed/);
 assert.match(todoJs, /tasks = tasks\.filter\(entry => entry\.id !== task\.id\)/);
+assert.match(todoJs, /markAll/);
+assert.match(todoJs, /clearCompleted/);
+
+const imageTool = fs.readFileSync(path.join(root, "public/js/tool-image.js"), "utf8");
+assert.match(imageTool, /image\/gif/);
+assert.match(imageTool, /type === "image\/gif" \? "GIF"/);
+assert.match(imageTool, /URL\.createObjectURL/);
 
 const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
 const rewriteSources = new Set(vercel.rewrites.map(item => item.source));
@@ -120,7 +146,7 @@ const get = route => new Promise((resolve, reject) => {
       req.end();
     });
     assert.strictEqual(method, 405);
-    console.log("Route, security-header, stale-reference, Vercel-rewrite, 404, traversal, malformed-request, method and syntax tests passed.");
+    console.log("Route, security-header, stale-reference, Vercel-rewrite, visual-preservation, Todo, image-format, 404, traversal, malformed-request, method and syntax tests passed.");
   } finally {
     child.kill();
   }
