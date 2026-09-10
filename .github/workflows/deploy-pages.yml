@@ -47,21 +47,26 @@ jobs:
           from pathlib import Path
           import re
           import shutil
+          import os
 
           root = Path("_site")
-          base = "/adarsh-portfolio/"
-          pattern = re.compile(r'(?P<prefix>[\"\'\(=\s:])/(?P<path>(?!/)[A-Za-z0-9_.-][^\"\'\s\)]*)')
+          repository = os.environ.get("GITHUB_REPOSITORY", "")
+          repo_name = repository.split("/", 1)[-1]
+          base = "/" if repo_name.endswith(".github.io") else f"/{repo_name}/"
+          site_origin = "https://adarshkumar-s.github.io" if repo_name.endswith(".github.io") else f"https://adarshkumar-s.github.io{base.rstrip('/')}"
 
+          pattern = re.compile(r'(?P<prefix>[\"\'\(=\s:])/(?P<path>(?!/)[A-Za-z0-9_.-][^\"\'\s\)]*)')
           text_extensions = {".html", ".css", ".js", ".xml", ".txt", ".svg", ".json"}
           for path in root.rglob("*"):
               if not path.is_file() or path.suffix.lower() not in text_extensions:
                   continue
               text = path.read_text(encoding="utf-8")
-              text = pattern.sub(lambda m: m.group("prefix") + base + m.group("path"), text)
+              if base != "/":
+                  text = pattern.sub(lambda m: m.group("prefix") + base + m.group("path"), text)
               if path.name == "sitemap.xml":
-                  text = re.sub(r'<loc>/adarsh-portfolio/', '<loc>https://adarshkumar-s.github.io/adarsh-portfolio/', text)
+                  text = re.sub(r'<loc>[^<]*/', f'<loc>{site_origin}/', text)
               if path.name == "robots.txt":
-                  text = re.sub(r'^Sitemap: /adarsh-portfolio/', 'Sitemap: https://adarshkumar-s.github.io/adarsh-portfolio/', text, flags=re.MULTILINE)
+                  text = re.sub(r'^Sitemap: .*$', f'Sitemap: {site_origin}/sitemap.xml', text, flags=re.MULTILINE)
               path.write_text(text, encoding="utf-8")
 
           aliases = {
