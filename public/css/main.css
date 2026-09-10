@@ -1765,3 +1765,21 @@ body::after{
 @media(prefers-reduced-motion:reduce){
   [data-infinite-project-rail]{transform:none!important}
 }
+
+/* ---------- global velocity sparks ---------- */
+.velocity-sparks{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:9999;
+  display:block;
+  pointer-events:none;
+  overflow:hidden;
+}
+@media (hover:none),(pointer:coarse){
+  .velocity-sparks{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  .velocity-sparks{display:none!important}
+}
