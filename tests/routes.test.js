@@ -8,7 +8,7 @@ const routes = [
   "/", "/projects", "/projects/anshika-studio", "/projects/todo-app", "/projects/previous-portfolio",
   "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground",
   "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/stack",
-  "/blog", "/about", "/contact", "/stats", "/todo", "/archive/previous-portfolio/"
+  "/blog", "/about", "/contact", "/stats", "/todo", "/archive/previous-portfolio"
 ];
 
 const root = path.join(__dirname, "..");
