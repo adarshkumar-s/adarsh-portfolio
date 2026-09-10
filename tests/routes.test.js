@@ -104,7 +104,7 @@ assert.match(projects, /Previous portfolio preview/);
 assert.doesNotMatch(projects, /Character Gallery|character-gallery/);
 
 const todo = fs.readFileSync(path.join(root, "public/todo-app/index.html"), "utf8");
-assert.match(todo, /My Todo List/);
+assert.match(todo, /TaskFlow/);
 assert.match(todo, /todoForm/);
 assert.match(todo, /\/js\/todo\.js/);
 
