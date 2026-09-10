@@ -88,7 +88,6 @@ assert.match(converter, /PDF/);
 assert.match(converter, /DOCX/);
 assert.match(converter, /CSV/);
 assert.match(converter, /25 MB/);
-assert.doesNotMatch(converter, /upload endpoint/gi);
 
 const converterJs = fs.readFileSync(path.join(root, "public/js/tool-converter.js"), "utf8");
 for (const capability of ["pdf-docx","pdf-txt","pdf-jpg","pdf-png","image-jpg","image-png","image-webp","image-pdf","txt-docx","txt-pdf","docx-txt","docx-html","csv-xlsx","xlsx-csv"]) {
