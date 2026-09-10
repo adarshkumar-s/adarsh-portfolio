@@ -43,7 +43,6 @@
     const maxShift = Math.min(22, energy * 17 + velocity * 10);
 
     ctx.save();
-    ctx.globalCompositeOperation = "source-over";
     for (let y = top; y < bottom; y += band) {
       const distance = Math.abs(y - cy) / radius;
       const influence = Math.max(0, 1 - distance);
@@ -64,7 +63,8 @@
     pointer.x += (target.x - pointer.x) * follow;
     pointer.y += (target.y - pointer.y) * follow;
     velocity += (targetVelocity - velocity) * .16;
-    energy += ((inside ? targetVelocity * 2.4 + .08 : 0) - energy) * (1 - Math.pow(.001, dt / 260));
+    // Energy is driven only by pointer velocity, so it can fully decay after movement stops.
+    energy += ((inside ? targetVelocity * 2.4 : 0) - energy) * (1 - Math.pow(.001, dt / 260));
     targetVelocity *= Math.pow(.68, dt / 16.67);
     drawLiquid();
     if (inside || energy > .01) raf = requestAnimationFrame(frame);
