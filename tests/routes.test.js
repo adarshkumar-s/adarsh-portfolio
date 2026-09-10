@@ -30,7 +30,7 @@ const jsFiles = [
   "public/js/site.js", "public/js/contact.js", "public/js/tools.js",
   "public/js/lab-liquid.js", "public/js/lab-magnetic.js", "public/js/lab-scroll.js",
   "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js",
-  "public/js/tool-converter.js", "public/js/todo.js"
+  "public/js/tool-converter.js", "public/js/todo.js", "public/js/velocity-sparks.js"
 ];
 jsFiles.forEach(file => execFileSync(process.execPath, ["--check", path.join(root, file)], {stdio: "pipe"}));
 
@@ -67,6 +67,9 @@ assert.match(mainCss, /\.footer-socials/);
 assert.match(mainCss, /\[data-infinite-project-rail\]/);
 assert.match(mainCss, /\.custom-cursor/);
 assert.match(mainCss, /\.hero-a-stage/);
+assert.match(mainCss, /\.velocity-sparks/);
+assert.match(homepage, /<script src="\/js\/site\.js" defer><\/script>/);
+assert.match(mainCss, /pointer-events:none/);
 
 const labs = fs.readFileSync(path.join(root, "public/labs/index.html"), "utf8");
 assert.match(labs, /Liquid Interaction/);
@@ -114,6 +117,15 @@ for (const route of routes) assert.ok(rewriteSources.has(route), "missing Vercel
 assert.ok(!rewriteSources.has("/projects/character-gallery"));
 assert.ok(!rewriteSources.has("/projects/todo-app"));
 assert.match(vercel.headers[0].headers.find(h => h.key === "Content-Security-Policy").value, /cdn\.jsdelivr\.net/);
+const siteJs = fs.readFileSync(path.join(root, "public/js/site.js"), "utf8");
+assert.match(siteJs, /velocity-sparks\.js/);
+const sparksJs = fs.readFileSync(path.join(root, "public/js/velocity-sparks.js"), "utf8");
+assert.match(sparksJs, /requestAnimationFrame/);
+assert.match(sparksJs, /prefers-reduced-motion/);
+assert.match(sparksJs, /devicePixelRatio/);
+assert.match(sparksJs, /MAX_PARTICLES = 120/);
+assert.match(sparksJs, /distance \/ elapsed/);
+assert.match(sparksJs, /pointermove/);
 
 const child = spawn(process.execPath, ["server.js"], {env: {...process.env, PORT: "3219"}});
 const get = route => new Promise((resolve, reject) => {
