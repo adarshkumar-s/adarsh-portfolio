@@ -11,6 +11,7 @@ const routes = [
   "/blog", "/about", "/contact", "/stats", "/todo", "/archive/previous-portfolio/"
 ];
 
+const root = path.join(__dirname, "..");
 const requiredFiles = [
   "public/index.html", "public/projects/index.html", "public/projects/todo-app.html",
   "public/projects/previous-portfolio.html", "public/todo-app/index.html", "public/archive/previous-portfolio/index.html",
@@ -19,31 +20,30 @@ const requiredFiles = [
   "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/stack/index.html",
   "server.js", "vercel.json", "SECURITY.md", ".github/workflows/test.yml"
 ];
-requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(__dirname, "..", file)), file + " should exist"));
-assert.ok(!fs.existsSync(path.join(__dirname, "..", "public/projects/character-gallery.html")));
-assert.ok(!fs.existsSync(path.join(__dirname, "..", "public/Doraemon.png")));
+requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(root, file)), file + " should exist"));
+assert.ok(!fs.existsSync(path.join(root, "public/projects/character-gallery.html")));
+assert.ok(!fs.existsSync(path.join(root, "public/Doraemon.png")));
 
 const jsFiles = [
   "public/js/site.js", "public/js/todo.js", "public/js/contact.js", "public/js/tools.js",
   "public/js/lab-liquid.js", "public/js/lab-magnetic.js", "public/js/lab-scroll.js",
   "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js"
 ];
-jsFiles.forEach(file => execFileSync(process.execPath, ["--check", path.join(__dirname, "..", file)], {stdio: "pipe"}));
+jsFiles.forEach(file => execFileSync(process.execPath, ["--check", path.join(root, file)], {stdio: "pipe"}));
 
-const root = path.join(__dirname, "..");
 const currentSurfaceText = [];
-function collect(dir) {
+function collectCurrentSurface(dir) {
   for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (full === path.join(root, "public/archive")) continue;
-      collect(full);
+      if (full === path.join(root, "public/archive") || full === path.join(root, "tests")) continue;
+      collectCurrentSurface(full);
     } else if (/\.(html|css|js|json|md|xml|txt|yml|yaml)$/.test(entry.name)) {
       currentSurfaceText.push([full, fs.readFileSync(full, "utf8")]);
     }
   }
 }
-collect(root);
+collectCurrentSurface(root);
 for (const [file, text] of currentSurfaceText) {
   assert.doesNotMatch(text, /Character Gallery|character-gallery|Task Tracker|Experiment slot|premium-portfolio/,
     "obsolete current-surface reference in " + path.relative(root, file));
@@ -68,11 +68,15 @@ assert.match(projects, /Previous portfolio preview/);
 assert.doesNotMatch(projects, /Character Gallery|character-gallery/);
 
 const todo = fs.readFileSync(path.join(root, "public/todo-app/index.html"), "utf8");
+const todoJs = fs.readFileSync(path.join(root, "public/js/todo.js"), "utf8");
 assert.match(todo, /searchInput/);
 assert.match(todo, /data-filter="active"/);
 assert.match(todo, /data-filter="completed"/);
 assert.match(todo, /sortSelect/);
-assert.match(todo, /localStorage/);
+assert.match(todoJs, /localStorage/);
+assert.match(todoJs, /editTask/);
+assert.match(todoJs, /completed = !task\.completed/);
+assert.match(todoJs, /tasks = tasks\.filter\(entry => entry\.id !== task\.id\)/);
 
 const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
 const rewriteSources = new Set(vercel.rewrites.map(item => item.source));
@@ -100,8 +104,7 @@ const get = route => new Promise((resolve, reject) => {
       assert.match(res.headers["content-security-policy"], /default-src 'self'/);
     }
 
-    const removed = await get("/projects/character-gallery");
-    assert.strictEqual(removed.status, 404);
+    assert.strictEqual((await get("/projects/character-gallery")).status, 404);
     const missing = await get("/does-not-exist");
     assert.strictEqual(missing.status, 404);
     assert.doesNotMatch(missing.body, /Error:|at .*server\.js|\/.*server\.js/);
