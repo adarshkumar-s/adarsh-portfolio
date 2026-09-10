@@ -96,7 +96,7 @@ for (const capability of ["pdf-docx","pdf-txt","pdf-jpg","pdf-png","image-jpg","
 }
 assert.match(converterJs, /MAX_BYTES=25\*1024\*1024/);
 assert.match(converterJs, /safeBase/);
-assert.doesNotMatch(converterJs, /fetch\\([^)]*file|FormData/);
+assert.doesNotMatch(converterJs, /fetch\([^)]*file|FormData/);
 
 const projects = fs.readFileSync(path.join(root, "public/projects/index.html"), "utf8");
 assert.match(projects, /Anshika Studio/);
