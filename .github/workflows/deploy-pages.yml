@@ -26,6 +26,8 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Prepare static site
         shell: bash
@@ -57,9 +59,6 @@ jobs:
                   text = re.sub(r'^Sitemap: /adarsh-portfolio/', 'Sitemap: https://adarshkumar-s.github.io/adarsh-portfolio/', text, flags=re.MULTILINE)
               path.write_text(text, encoding="utf-8")
 
-          # GitHub Pages serves clean URLs for directories containing index.html.
-          # Keep the existing .html sources untouched and publish exact copies at
-          # the clean paths already used by the portfolio navigation.
           aliases = {
               "projects/anshika-studio.html": "projects/anshika-studio/index.html",
               "projects/previous-portfolio.html": "projects/previous-portfolio/index.html",
@@ -78,7 +77,6 @@ jobs:
         with:
           path: ./_site
 
-      # Trigger a fresh Pages deployment from main after Pages source is enabled.
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
