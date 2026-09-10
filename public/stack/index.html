@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Tech Stack & Infrastructure — the technologies and services behind Adarsh Kumar's projects.">
+<meta name="theme-color" content="#050607">
+<meta property="og:title" content="Tech Stack & Infrastructure — Adarsh Kumar">
+<meta property="og:description" content="A practical view of the technologies, development tools and infrastructure used across Adarsh Kumar's projects.">
+<meta property="og:type" content="website">
+<title>Tech Stack &amp; Infrastructure — Adarsh Kumar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/adarsh-a-favicon.svg" sizes="any">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/adarsh-a-favicon.svg">
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+<header class="page-hero stack-hero shell">
+<div class="stack-hero-grid"><div><span class="eyebrow">TECH STACK / INFRASTRUCTURE</span><h1>From build to<br><em>run.</em></h1></div><div class="stack-intro"><span class="stack-route">01 — 03</span><p>A practical stack, shown in the context of the work it supports. The emphasis is on the workflow rather than a list of logos.</p></div></div>
+<div class="stack-flow" aria-label="Application workflow: build, test and version, deploy, run"><span>BUILD</span><i aria-hidden="true"></i><span>TEST &amp; VERSION</span><i aria-hidden="true"></i><span>DEPLOY</span><i aria-hidden="true"></i><span>RUN</span></div>
+</header>
+
+<section class="section stack-section shell" aria-labelledby="build-title"><div class="stack-section-head"><div><span class="eyebrow">01 / BUILD WITH</span><h2 id="build-title">The application layer.</h2></div><p>Interface structure, client-side behaviour, backend services and relational data.</p></div>
+<div class="stack-grid stack-grid-build">
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">&lt;/&gt;</span><span class="stack-kind">FRONTEND</span></div><h3>HTML</h3><p>Structure and semantic markup for web interfaces.</p><span class="stack-used">Used for <b>web structure</b></span></article>
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">#</span><span class="stack-kind">FRONTEND</span></div><h3>CSS</h3><p>Responsive layouts, visual systems and interaction styling.</p><span class="stack-used">Used for <b>visual systems</b></span></article>
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">JS</span><span class="stack-kind">FRONTEND</span></div><h3>JavaScript</h3><p>Interactive UI behaviour and client-side functionality.</p><span class="stack-used">Used for <b>interaction</b></span></article>
+<article class="stack-card stack-card-wide" tabindex="0"><div class="stack-card-top"><span class="stack-mark">PY</span><span class="stack-kind">BACKEND</span></div><h3>Python</h3><p>Primary backend language for application development.</p><span class="stack-used">Used for <b>application logic</b></span></article>
+<article class="stack-card stack-card-wide" tabindex="0"><div class="stack-card-top"><span class="stack-mark">API</span><span class="stack-kind">BACKEND</span></div><h3>FastAPI</h3><p>Backend framework used for API and application development.</p><span class="stack-used">Used for <b>backend APIs</b></span></article>
+<article class="stack-card stack-card-wide" tabindex="0"><div class="stack-card-top"><span class="stack-mark">ORM</span><span class="stack-kind">BACKEND</span></div><h3>SQLAlchemy</h3><p>Database ORM used with the backend.</p><span class="stack-used">Used for <b>data access</b></span></article>
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">PG</span><span class="stack-kind">DATABASE</span></div><h3>PostgreSQL</h3><p>Relational database used for production application data.</p><span class="stack-used">Used for <b>relational data</b></span></article>
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">SQ</span><span class="stack-kind">DATABASE</span></div><h3>SQLite</h3><p>Lightweight database used for local development.</p><span class="stack-used">Used for <b>local data</b></span></article>
+</div></section>
+
+<section class="stack-transition" aria-hidden="true"><div class="shell"><span>BUILD</span><b>↓</b><span>TEST</span></div></section>
+
+<section class="section stack-section stack-section-test shell" aria-labelledby="test-title"><div class="stack-section-head"><div><span class="eyebrow">02 / TEST &amp; DEVELOP</span><h2 id="test-title">Make changes traceable.</h2></div><p>API checks and source-control workflow keep the build repeatable and visible.</p></div>
+<div class="stack-grid stack-grid-test">
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">POST</span><span class="stack-kind">API</span></div><h3>Postman</h3><p>Used to test and validate API endpoints and request/response behaviour.</p><span class="stack-used">Used for <b>API validation</b></span></article>
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">GIT</span><span class="stack-kind">VERSION CONTROL</span></div><h3>Git</h3><p>Version control for tracking development changes.</p><span class="stack-used">Used for <b>change history</b></span></article>
+<article class="stack-card" tabindex="0"><div class="stack-card-top"><span class="stack-mark">GH</span><span class="stack-kind">SOURCE HOSTING</span></div><h3>GitHub</h3><p>Repository hosting and source control workflow.</p><span class="stack-used">Used for <b>repositories</b></span></article>
+</div></section>
+
+<section class="stack-transition" aria-hidden="true"><div class="shell"><span>TEST &amp; VERSION</span><b>↓</b><span>DEPLOY</span></div></section>
+
+<section class="section stack-section stack-section-deploy shell" aria-labelledby="deploy-title"><div class="stack-section-head"><div><span class="eyebrow">03 / DEPLOY &amp; INFRASTRUCTURE</span><h2 id="deploy-title">Where the build runs.</h2></div><p>Hosting and database infrastructure sit at the final hand-off from source to a running application.</p></div>
+<div class="stack-grid stack-grid-deploy">
+<article class="stack-card stack-card-service" tabindex="0"><div class="stack-card-top"><span class="stack-mark">R</span><span class="stack-kind">DEPLOYMENT</span></div><h3>Render</h3><p>Used to deploy and run the Anshika Studio backend/application.</p><span class="stack-used">Service <b>application hosting</b></span></article>
+<article class="stack-card stack-card-service" tabindex="0"><div class="stack-card-top"><span class="stack-mark">V</span><span class="stack-kind">DEPLOYMENT</span></div><h3>Vercel</h3><p>Used to deploy the portfolio web experience.</p><span class="stack-used">Service <b>web hosting</b></span></article>
+<article class="stack-card stack-card-service" tabindex="0"><div class="stack-card-top"><span class="stack-mark">N</span><span class="stack-kind">DATABASE INFRASTRUCTURE</span></div><h3>Neon</h3><p>Hosted PostgreSQL infrastructure used for production database storage.</p><span class="stack-used">Service <b>hosted PostgreSQL</b></span></article>
+</div></section>
+
+<section class="section stack-workflows shell" aria-labelledby="workflow-title"><div class="stack-section-head workflow-heading"><div><span class="eyebrow">WHERE THE STACK COMES TOGETHER</span><h2 id="workflow-title">Two real project paths.</h2></div><p>The tools above become useful when they connect to an actual application lifecycle.</p></div>
+<div class="workflow-list">
+<article class="workflow-card"><div class="workflow-meta"><span class="eyebrow">PROJECT / ANSHIKA STUDIO</span><a class="text-link" href="/projects/anshika-studio">Case study →</a></div><h3>Anshika Studio</h3><div class="workflow-line" aria-label="Anshika Studio workflow"><span>Python</span><b>→</b><span>FastAPI</span><b>→</b><span>SQLAlchemy</span><b>→</b><span>PostgreSQL / Neon</span><b>→</b><span>Render</span></div><div class="workflow-support"><span>Postman</span><i aria-hidden="true"></i><span>API checks</span><span class="workflow-separator">•</span><span>Git / GitHub</span><i aria-hidden="true"></i><span>version history</span></div></article>
+<article class="workflow-card workflow-card-portfolio"><div class="workflow-meta"><span class="eyebrow">PROJECT / PORTFOLIO</span><a class="text-link" href="/">Open site →</a></div><h3>Portfolio</h3><div class="workflow-line" aria-label="Portfolio workflow"><span>HTML</span><b>→</b><span>CSS</span><b>→</b><span>JavaScript</span><b>→</b><span>Git / GitHub</span><b>→</b><span>Vercel</span></div><div class="workflow-support"><span>Current portfolio</span><i aria-hidden="true"></i><span>static web experience</span></div></article>
+</div></section>
+
+<section class="stack-run-band" aria-label="Lifecycle conclusion"><div class="shell stack-run-inner"><div><span class="eyebrow">BUILD → TEST → DEPLOY → RUN</span><h2>The stack is a workflow, not a checklist.</h2></div><a class="button button-primary" href="/projects">See the work ↗</a></div></section>
+</main>
+<div id="site-footer"></div>
+<script src="/js/site.js" defer></script>
+</body>
+</html>
