@@ -8,13 +8,19 @@ const PORT = Number(process.env.PORT) || 3000;
 
 const ROUTES = new Map([
   ["/", "index.html"], ["/projects", "projects/index.html"], ["/labs", "labs/index.html"],
-  ["/tools", "tools/index.html"], ["/blog", "blog/index.html"], ["/about", "about/index.html"],
-  ["/contact", "contact/index.html"], ["/stats", "stats/index.html"], ["/todo", "todo-app/index.html"],
+  ["/tools", "tools/index.html"], ["/stack", "stack/index.html"], ["/blog", "blog/index.html"],
+  ["/about", "about/index.html"], ["/contact", "contact/index.html"], ["/stats", "stats/index.html"],
+  ["/todo", "todo-app/index.html"],
   ["/projects/anshika-studio", "projects/anshika-studio.html"],
   ["/projects/todo-app", "projects/todo-app.html"],
   ["/projects/previous-portfolio", "projects/previous-portfolio.html"],
-  ["/projects/character-gallery", "projects/character-gallery.html"],
   ["/projects/sih-2026", "projects/sih-2026.html"],
+  ["/labs/liquid-interaction", "labs/liquid-interaction/index.html"],
+  ["/labs/magnetic-ui", "labs/magnetic-ui/index.html"],
+  ["/labs/scroll-playground", "labs/scroll-playground/index.html"],
+  ["/tools/json", "tools/json/index.html"],
+  ["/tools/image-optimizer", "tools/image-optimizer/index.html"],
+  ["/tools/gradient-generator", "tools/gradient-generator/index.html"],
   ["/archive/previous-portfolio", "archive/previous-portfolio/index.html"]
 ]);
 
