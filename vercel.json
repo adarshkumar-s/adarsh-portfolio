@@ -37,6 +37,7 @@
     { "source": "/tools/image-optimizer", "destination": "/tools/image-optimizer/index.html" },
     { "source": "/tools/gradient-generator", "destination": "/tools/gradient-generator/index.html" },
     { "source": "/tools/file-converter", "destination": "/tools/file-converter/index.html" },
+    { "source": "/todo", "destination": "/todo-app/index.html" },
     { "source": "/archive/previous-portfolio", "destination": "/archive/previous-portfolio/index.html" }
   ]
 }

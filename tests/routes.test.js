@@ -7,7 +7,7 @@ const {spawn, execFileSync} = require("child_process");
 const routes = [
   "/", "/projects", "/projects/anshika-studio", "/projects/previous-portfolio", "/projects/sih-2026",
   "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground",
-  "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/tools/file-converter", "/stack",
+  "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/tools/file-converter", "/todo", "/stack",
   "/blog", "/about", "/contact", "/stats", "/archive/previous-portfolio"
 ];
 
@@ -101,7 +101,6 @@ const projects = fs.readFileSync(path.join(root, "public/projects/index.html"), 
 assert.match(projects, /Anshika Studio/);
 assert.match(projects, /SIH 2026/);
 assert.match(projects, /Previous portfolio preview/);
-assert.doesNotMatch(projects, /Todo App|todo-app|\/todo\b/i);
 assert.doesNotMatch(projects, /Character Gallery|character-gallery/);
 
 const todo = fs.readFileSync(path.join(root, "public/todo-app/index.html"), "utf8");
@@ -139,8 +138,7 @@ const get = route => new Promise((resolve, reject) => {
     }
     assert.strictEqual((await get("/projects/character-gallery")).status, 404);
     assert.strictEqual((await get("/projects/todo-app")).status, 404);
-    assert.strictEqual((await get("/todo")).status, 404);
-    const missing = await get("/does-not-exist");
+        const missing = await get("/does-not-exist");
     assert.strictEqual(missing.status, 404);
     assert.doesNotMatch(missing.body, /Error:|at .*server\.js|\/.*server\.js/);
     assert.strictEqual((await get("/../../package.json")).status, 404);

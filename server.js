@@ -20,6 +20,7 @@ const ROUTES = new Map([
   ["/tools/image-optimizer", "tools/image-optimizer/index.html"],
   ["/tools/gradient-generator", "tools/gradient-generator/index.html"],
   ["/tools/file-converter", "tools/file-converter/index.html"],
+  ["/todo", "todo-app/index.html"],
   ["/archive/previous-portfolio", "archive/previous-portfolio/index.html"]
 ]);
 
