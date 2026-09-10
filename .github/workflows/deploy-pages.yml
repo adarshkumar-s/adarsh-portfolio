@@ -38,6 +38,11 @@ jobs:
           cp -R public/. _site/
           cp .nojekyll _site/.nojekyll
 
+          # Publish the preserved original portfolio as its own static site.
+          rm -rf _site/old-portfolio
+          mkdir -p _site/old-portfolio
+          cp -R public/archive/previous-portfolio/. _site/old-portfolio/
+
           python3 <<'PY'
           from pathlib import Path
           import re
