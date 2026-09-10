@@ -29,6 +29,9 @@ Copy `.env.example` to `.env` only when local server configuration is needed. Th
 - `public/projects/` — project pages
 - `public/archive/previous-portfolio/` — preserved earlier portfolio
 - `public/todo-app/` — Todo application
+- `public/labs/` — interactive experiments
+- `public/tools/` — browser-local utilities
+- `public/stack/` — Tech Stack & Infrastructure
 - `public/js/` — shared and page-specific browser scripts
 - `tests/` — route/server tests
 - `server.js` — local static HTTP server
@@ -43,7 +46,14 @@ Copy `.env.example` to `.env` only when local server configuration is needed. Th
 - `/projects/previous-portfolio`
 - `/projects/sih-2026`
 - `/labs`
+- `/labs/liquid-interaction`
+- `/labs/magnetic-ui`
+- `/labs/scroll-playground`
 - `/tools`
+- `/tools/json`
+- `/tools/image-optimizer`
+- `/tools/gradient-generator`
+- `/stack`
 - `/blog`
 - `/about`
 - `/contact`
@@ -53,7 +63,7 @@ Copy `.env.example` to `.env` only when local server configuration is needed. Th
 
 ## Testing
 
-`npm test` starts the local server on an isolated test port and checks important routes, 404 behavior, traversal rejection, and unsupported HTTP methods.
+`npm test` starts the local server on an isolated test port and checks required routes, security headers, current-surface stale references, 404 behavior, traversal rejection, malformed requests, unsupported HTTP methods, Vercel rewrites, and JavaScript syntax.
 
 ## Deployment
 
