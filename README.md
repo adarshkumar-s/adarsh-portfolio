@@ -1,57 +1,69 @@
-# Adarsh — Current Developer Platform
+# Adarsh Kumar
 
-This branch contains the current personal developer platform. The previous portfolio is intentionally preserved as an archived project rather than deleted.
+A static, multi-page personal portfolio built with HTML, CSS, JavaScript, and a small Node.js server for local development.
 
-## Run locally
+## Stack
 
-`npm install`
-`npm test`
-`npm start`
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Node.js built-in `http`, `fs`, and `path` modules
+
+## Install and run
+
+```bash
+npm ci
+npm test
+npm start
+```
 
 Open `http://localhost:3000`.
 
-## Current routes
+## Environment
 
-- /
-- /projects
-- /projects/anshika-studio
-- /projects/todo-app
-- /projects/previous-portfolio
-- /projects/character-gallery
-- /labs
-- /tools
-- /blog
-- /about
-- /contact
-- /stats
-- /todo
-- /archive/previous-portfolio/
+Copy `.env.example` to `.env` only when local server configuration is needed. The current server only uses `PORT`; keep real secrets out of the repository and frontend files.
 
-## Projects
+## Project structure
 
-Only four projects are presented:
+- `public/` — site pages, styles, scripts, images, and archived portfolio assets
+- `public/projects/` — project pages
+- `public/archive/previous-portfolio/` — preserved earlier portfolio
+- `public/todo-app/` — Todo application
+- `public/js/` — shared and page-specific browser scripts
+- `tests/` — route/server tests
+- `server.js` — local static HTTP server
+- `vercel.json` — static Vercel routing and security headers
 
-1. Anshika Studio — verified from the connected GitHub repository.
-2. Todo App — preserved as a working browser application and case study.
-3. Previous Portfolio — the original portfolio is preserved under `public/archive/previous-portfolio/`.
-4. Character Gallery — the earlier visual experiment using existing assets.
+## Routes
 
-No fabricated projects, statistics, employment, education, clients, testimonials or achievements are included.
+- `/`
+- `/projects`
+- `/projects/anshika-studio`
+- `/projects/todo-app`
+- `/projects/previous-portfolio`
+- `/projects/sih-2026`
+- `/labs`
+- `/tools`
+- `/blog`
+- `/about`
+- `/contact`
+- `/stats`
+- `/todo`
+- `/archive/previous-portfolio/`
 
-## Vercel
+## Testing
 
-The site is a static multi-page deployment. `vercel.json` explicitly maps clean URLs to HTML files and supplies security headers. `server.js` remains the local Node server; it is not required to render the static Vercel site.
+`npm test` starts the local server on an isolated test port and checks important routes, 404 behavior, traversal rejection, and unsupported HTTP methods.
 
-## Security
+## Deployment
 
-- No secrets are stored in frontend code.
-- `.env` files are ignored; `.env.example` contains placeholders only.
-- Local routing rejects traversal attempts.
-- Security headers include CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy and Permissions-Policy.
-- Browser Todo state remains localStorage data.
-- Browser tools do not upload their inputs.
-- Contact validation does not claim email delivery without a configured provider.
+The site is configured as a static Vercel deployment. `vercel.json` maps clean routes to the corresponding HTML files and supplies security headers. The Node server is for local development and automated route checks.
 
-## Content policy
+## Security and development notes
 
-Unknown personal information remains unknown. Real project facts are sourced from repository evidence. Live demo URLs, email delivery and verified GitHub activity are not claimed unless configured or verified.
+- `.env` files are ignored and `.env.example` contains placeholders only.
+- The static server confines resolved paths to `public/` and rejects traversal attempts.
+- Production responses avoid exposing stack traces or filesystem paths.
+- Security headers include CSP, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy`.
+- External links opened in new tabs use `noopener noreferrer`.
+- Keep dependencies minimal and review `npm audit` results before dependency changes.
