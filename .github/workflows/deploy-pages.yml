@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp -R public/. _site/
+          cp .nojekyll _site/.nojekyll
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path("_site")
+          base = "/adarsh-portfolio/"
+          pattern = re.compile(r'(?P<prefix>[\"\'\(=\s:])/(?P<path>(?!/)[A-Za-z0-9_.-][^\"\'\s\)]*)')
+
+          text_extensions = {".html", ".css", ".js", ".xml", ".txt", ".svg", ".json"}
+          for path in root.rglob("*"):
+              if not path.is_file() or path.suffix.lower() not in text_extensions:
+                  continue
+              text = path.read_text(encoding="utf-8")
+              text = pattern.sub(lambda m: m.group("prefix") + base + m.group("path"), text)
+              if path.name == "sitemap.xml":
+                  text = re.sub(r'<loc>/adarsh-portfolio/', '<loc>https://adarshkumar-s.github.io/adarsh-portfolio/', text)
+              if path.name == "robots.txt":
+                  text = re.sub(r'^Sitemap: /adarsh-portfolio/', 'Sitemap: https://adarshkumar-s.github.io/adarsh-portfolio/', text, flags=re.MULTILINE)
+              path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Upload public directory
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
