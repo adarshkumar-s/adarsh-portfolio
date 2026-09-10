@@ -3,7 +3,7 @@
 
   const navItems = [
     ["/", "Home"], ["/projects", "Projects"], ["/labs", "Labs"],
-    ["/tools", "Tools"], ["/blog", "Blog"], ["/about", "About"],
+    ["/tools", "Tools"], ["/stack", "Stack"], ["/blog", "Blog"], ["/about", "About"],
     ["/stats", "Stats"], ["/contact", "Contact"]
   ];
 

@@ -1,1 +1,63 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Browser-based developer utilities."><title>Tools — Adarsh Kumar</title><link rel="stylesheet" href="/css/main.css"></head><body><div id="site-nav"></div><main class="shell"><header class="page-hero"><span class="eyebrow">TOOLS</span><h1>Useful utilities. No account. No upload.</h1><p>Everything runs locally in your browser. Input is not sent to a server.</p></header><section class="tool-grid"><article class="tool"><span class="tag">JSON</span><h2>Formatter</h2><textarea id="jsonIn" placeholder='{"hello":"world"}'></textarea><div class="tool-actions"><button class="small-button" data-action="format-json">Format</button><button class="small-button" data-action="minify-json">Minify</button></div><pre class="output" id="jsonOut"></pre></article><article class="tool"><span class="tag">ID</span><h2>UUID generator</h2><p>Generate UUIDs with the browser crypto API.</p><div class="tool-actions"><button class="small-button" data-action="uuid">Generate UUID</button><button class="small-button" data-copy="uuidOut">Copy</button></div><pre class="output" id="uuidOut"></pre></article><article class="tool"><span class="tag">SECURITY</span><h2>Password generator</h2><label for="passLen">Length</label><input id="passLen" type="number" min="8" max="128" value="20"><div class="tool-actions"><button class="small-button" data-action="password">Generate</button><button class="small-button" data-copy="passOut">Copy</button></div><pre class="output" id="passOut"></pre></article><article class="tool"><span class="tag">MARKDOWN</span><h2>Previewer</h2><textarea id="mdIn" placeholder="# Hello&#10;&#10;Write **Markdown** here."></textarea><div class="tool-actions"><button class="small-button" data-action="markdown">Preview</button></div><div class="output" id="mdOut"></div></article><article class="tool"><span class="tag">COLOR</span><h2>Color converter</h2><label for="hexIn">Hex</label><input id="hexIn" value="#B8FF5A" maxlength="7"><div class="tool-actions"><button class="small-button" data-action="color">Convert</button></div><pre class="output" id="colorOut"></pre><div class="swatch" id="swatch"></div></article><article class="tool"><span class="tag">TEXT</span><h2>Text analyzer</h2><textarea id="textIn" placeholder="Paste text here"></textarea><div class="tool-actions"><button class="small-button" data-action="textstats">Analyze</button></div><pre class="output" id="textOut"></pre></article></section></main><div id="site-footer"></div><script src="/js/site.js" defer></script><script src="/js/tools.js" defer></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Small browser utilities for JSON, images, CSS gradients and everyday developer tasks. Processing happens locally in the browser.">
+<meta name="theme-color" content="#07080c">
+<title>Tools — Adarsh Kumar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/adarsh-a-favicon.svg">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/labs-tools.css">
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+<header class="page-hero platform-hero shell">
+  <div class="platform-kicker"><span class="eyebrow">TOOLS / LOCAL WORKBENCH</span><span class="platform-index">02 — 03</span></div>
+  <h1>Useful utilities.<br><em>Nothing leaves the browser.</em></h1>
+  <p class="platform-lede">Small utilities built to solve practical developer and design problems. JSON, images and colors are processed locally in your browser.</p>
+</header>
+<section class="section shell" aria-labelledby="featured-tools-title">
+  <div class="platform-section-head"><div><span class="eyebrow">FEATURED TOOLS / 03</span><h2 id="featured-tools-title">Open a tool.</h2></div><p>No account, upload service or API key. The featured utilities use browser capabilities and keep your input on this device.</p></div>
+  <div class="platform-grid">
+    <article class="platform-card js-reveal">
+      <div class="platform-card-top"><span class="tag">DEVELOPER</span><span class="platform-number">01</span></div>
+      <div class="tool-swatch tool-swatch-json" aria-hidden="true"><span>{ }</span><i></i></div>
+      <h3>JSON Formatter / Validator</h3><p>Validate, format and minify JSON with useful parse errors and one-click copying.</p>
+      <div class="tag-row"><span>JSON.parse</span><span>Local</span><span>Clipboard</span></div>
+      <div class="platform-card-foot"><span class="meta">Input / output</span><a class="text-link" href="/tools/json">Open tool →</a></div>
+    </article>
+    <article class="platform-card js-reveal">
+      <div class="platform-card-top"><span class="tag">MEDIA</span><span class="platform-number">02</span></div>
+      <div class="tool-swatch tool-swatch-image" aria-hidden="true"><span>IMAGE</span><i></i></div>
+      <h3>Image Optimizer</h3><p>Compress a local image, compare dimensions and file size, then download the optimized result.</p>
+      <div class="tag-row"><span>Canvas</span><span>Blob</span><span>Local</span></div>
+      <div class="platform-card-foot"><span class="meta">Image / compression</span><a class="text-link" href="/tools/image-optimizer">Open tool →</a></div>
+    </article>
+    <article class="platform-card js-reveal">
+      <div class="platform-card-top"><span class="tag">DESIGN</span><span class="platform-number">03</span></div>
+      <div class="tool-swatch tool-swatch-gradient" aria-hidden="true"><span></span><i></i></div>
+      <h3>Gradient Generator</h3><p>Build linear or radial gradients, tune direction and copy production-ready CSS instantly.</p>
+      <div class="tag-row"><span>CSS</span><span>Color Input</span><span>Clipboard</span></div>
+      <div class="platform-card-foot"><span class="meta">Color / CSS</span><a class="text-link" href="/tools/gradient-generator">Open tool →</a></div>
+    </article>
+  </div>
+</section>
+<section class="section shell" aria-labelledby="more-tools-title">
+  <div class="platform-section-head"><div><span class="eyebrow">MORE UTILITIES / 05</span><h2 id="more-tools-title">Everyday helpers.</h2></div><p>Smaller browser utilities remain available below the featured workbench.</p></div>
+  <div class="tool-grid">
+    <article class="tool js-reveal"><span class="tag">ID</span><h2>UUID Generator</h2><p>Generate UUIDs with the browser crypto API.</p><div class="tool-actions"><button class="small-button" data-action="uuid" type="button">Generate UUID</button><button class="small-button" data-copy="uuidOut" type="button">Copy</button></div><pre class="output" id="uuidOut" aria-live="polite"></pre></article>
+    <article class="tool js-reveal"><span class="tag">SECURITY</span><h2>Password Generator</h2><label for="passLen">Length</label><input id="passLen" type="number" min="8" max="128" value="20"><div class="tool-actions"><button class="small-button" data-action="password" type="button">Generate</button><button class="small-button" data-copy="passOut" type="button">Copy</button></div><pre class="output" id="passOut" aria-live="polite"></pre></article>
+    <article class="tool js-reveal"><span class="tag">MARKDOWN</span><h2>Markdown Previewer</h2><label class="sr-only" for="mdIn">Markdown input</label><textarea id="mdIn" placeholder="# Hello&#10;&#10;Write **Markdown** here."></textarea><div class="tool-actions"><button class="small-button" data-action="markdown" type="button">Preview</button></div><div class="output" id="mdOut" aria-live="polite"></div></article>
+    <article class="tool js-reveal"><span class="tag">COLOR</span><h2>Color Converter</h2><label for="hexIn">Hex</label><input id="hexIn" value="#B8FF5A" maxlength="7" inputmode="text"><div class="tool-actions"><button class="small-button" data-action="color" type="button">Convert</button></div><pre class="output" id="colorOut" aria-live="polite"></pre><div class="swatch" id="swatch" aria-label="Selected color preview"></div></article>
+    <article class="tool js-reveal"><span class="tag">TEXT</span><h2>Text Analyzer</h2><label class="sr-only" for="textIn">Text input</label><textarea id="textIn" placeholder="Paste text here"></textarea><div class="tool-actions"><button class="small-button" data-action="textstats" type="button">Analyze</button></div><pre class="output" id="textOut" aria-live="polite"></pre></article>
+  </div>
+</section>
+<section class="platform-band" aria-label="Local processing"><div class="shell platform-band-inner"><span class="eyebrow">LOCAL BY DEFAULT</span><p>Your JSON, images and color choices are processed in-browser. These tools do not send your input to a server.</p></div></section>
+</main>
+<div id="site-footer"></div>
+<script src="/js/site.js" defer></script>
+<script src="/js/tools.js" defer></script>
+</body>
+</html>
