@@ -14,24 +14,21 @@ const routes = [
 const root = path.join(__dirname, "..");
 const requiredFiles = [
   "public/index.html", "public/projects/index.html",
-  "public/projects/previous-portfolio.html", "public/projects/sih-2026.html", "public/archive/previous-portfolio/index.html",
+  "public/projects/anshika-studio.html", "public/projects/previous-portfolio.html", "public/projects/sih-2026.html", "public/projects/todo-app.html", "public/archive/previous-portfolio/index.html",
+  "public/todo-app/index.html", "public/css/todo.css", "public/js/todo.js",
   "public/labs/index.html", "public/labs/liquid-interaction/index.html", "public/labs/magnetic-ui/index.html",
   "public/labs/scroll-playground/index.html", "public/tools/index.html", "public/tools/json/index.html",
   "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/stack/index.html",
-  "server.js", "vercel.json", "SECURITY.md", ".github/dependabot.yml", ".github/workflows/test.yml"
+  "server.js", "vercel.json", "SECURITY.md", ".github/dependabot.yml", ".github/workflows/test.yml", ".github/workflows/deploy-pages.yml"
 ];
 requiredFiles.forEach(file => assert.ok(fs.existsSync(path.join(root, file)), file + " should exist"));
 assert.ok(!fs.existsSync(path.join(root, "public/projects/character-gallery.html")));
-assert.ok(!fs.existsSync(path.join(root, "public/projects/todo-app.html")));
-assert.ok(!fs.existsSync(path.join(root, "public/todo-app")));
-assert.ok(!fs.existsSync(path.join(root, "public/js/todo.js")));
-assert.ok(!fs.existsSync(path.join(root, "public/css/todo.css")));
 assert.ok(!fs.existsSync(path.join(root, "public/Doraemon.png")));
 
 const jsFiles = [
   "public/js/site.js", "public/js/contact.js", "public/js/tools.js",
   "public/js/lab-liquid.js", "public/js/lab-magnetic.js", "public/js/lab-scroll.js",
-  "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js"
+  "public/js/tool-json.js", "public/js/tool-image.js", "public/js/tool-gradient.js", "public/js/todo.js"
 ];
 jsFiles.forEach(file => execFileSync(process.execPath, ["--check", path.join(root, file)], {stdio: "pipe"}));
 
@@ -49,7 +46,7 @@ function collectCurrentSurface(dir) {
 }
 collectCurrentSurface(root);
 for (const [file, text] of currentSurfaceText) {
-  assert.doesNotMatch(text, /Character Gallery|character-gallery|Task Tracker|Experiment slot|premium-portfolio|Todo App|todo-app|\/todo\b|todo\.js|todo\.css/i,
+  assert.doesNotMatch(text, /Character Gallery|character-gallery|Experiment slot|premium-portfolio/i,
     "obsolete current-surface reference in " + path.relative(root, file));
 }
 
@@ -86,6 +83,11 @@ assert.match(projects, /SIH 2026/);
 assert.match(projects, /Previous portfolio preview/);
 assert.doesNotMatch(projects, /Todo App|todo-app|\/todo\b/i);
 assert.doesNotMatch(projects, /Character Gallery|character-gallery/);
+
+const todo = fs.readFileSync(path.join(root, "public/todo-app/index.html"), "utf8");
+assert.match(todo, /My Todo List/);
+assert.match(todo, /todoForm/);
+assert.match(todo, /\/js\/todo\.js/);
 
 const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
 const rewriteSources = new Set(vercel.rewrites.map(item => item.source));
@@ -133,7 +135,7 @@ const get = route => new Promise((resolve, reject) => {
       req.end();
     });
     assert.strictEqual(method, 405);
-    console.log("Route, security-header, stale-reference, Vercel-rewrite, visual-preservation, Todo-removal, 404, traversal, malformed-request, method and syntax tests passed.");
+    console.log("Route, security-header, stale-reference, Vercel-rewrite, visual-preservation, static-entry, 404, traversal, malformed-request, method and syntax tests passed.");
   } finally {
     child.kill();
   }
