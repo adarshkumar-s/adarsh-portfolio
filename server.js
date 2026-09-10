@@ -8,7 +8,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 const ROUTES = new Map([
   ["/", "index.html"], ["/projects", "projects/index.html"], ["/labs", "labs/index.html"],
-  ["/tools", "tools/index.html"], ["/blog", "blog/index.html"], ["/about", "about/index.html"],
+  ["/tools", "tools/index.html"], ["/stack", "stack/index.html"], ["/blog", "blog/index.html"], ["/about", "about/index.html"],
   ["/contact", "contact/index.html"], ["/stats", "stats/index.html"], ["/todo", "todo-app/index.html"],
   ["/projects/anshika-studio", "projects/anshika-studio.html"],
   ["/projects/todo-app", "projects/todo-app.html"],
