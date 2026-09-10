@@ -19,7 +19,6 @@ const ROUTES = new Map([
   ["/projects/anshika-studio", "projects/anshika-studio.html"],
   ["/projects/todo-app", "projects/todo-app.html"],
   ["/projects/previous-portfolio", "projects/previous-portfolio.html"],
-  ["/projects/character-gallery", "projects/character-gallery.html"],
   ["/projects/sih-2026", "projects/sih-2026.html"],
   ["/archive/previous-portfolio", "archive/previous-portfolio/index.html"]
 ]);
