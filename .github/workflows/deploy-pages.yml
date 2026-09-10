@@ -39,6 +39,7 @@ jobs:
           python3 <<'PY'
           from pathlib import Path
           import re
+          import shutil
 
           root = Path("_site")
           base = "/adarsh-portfolio/"
@@ -55,6 +56,21 @@ jobs:
               if path.name == "robots.txt":
                   text = re.sub(r'^Sitemap: /adarsh-portfolio/', 'Sitemap: https://adarshkumar-s.github.io/adarsh-portfolio/', text, flags=re.MULTILINE)
               path.write_text(text, encoding="utf-8")
+
+          # GitHub Pages serves clean URLs for directories containing index.html.
+          # Keep the existing .html sources untouched and publish exact copies at
+          # the clean paths already used by the portfolio navigation.
+          aliases = {
+              "projects/anshika-studio.html": "projects/anshika-studio/index.html",
+              "projects/previous-portfolio.html": "projects/previous-portfolio/index.html",
+              "projects/sih-2026.html": "projects/sih-2026/index.html",
+              "projects/todo-app.html": "projects/todo-app/index.html",
+          }
+          for source, target in aliases.items():
+              source_path = root / source
+              target_path = root / target
+              target_path.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(source_path, target_path)
           PY
 
       - name: Upload public directory
