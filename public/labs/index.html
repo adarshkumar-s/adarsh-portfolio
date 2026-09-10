@@ -1,1 +1,52 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Experiments and browser labs by Adarsh Kumar."><title>Labs — Adarsh Kumar</title><link rel="stylesheet" href="/css/main.css"></head><body><div id="site-nav"></div><main class="shell"><header class="page-hero"><span class="eyebrow">LABS</span><h1>A room for trying things without pretending they are finished products.</h1><p>Interactive experiments, UI studies and JavaScript prototypes live here. The Todo app is the first preserved lab.</p></header><section class="grid"><article class="card"><span class="tag">INTERACTIVE</span><h2>Task Tracker</h2><p>The existing Todo experiment, now available as a standalone route with local persistence.</p><div class="card-foot"><span class="meta">Preserved</span><a class="text-link" href="/todo">Launch →</a></div></article><article class="card"><span class="tag">VISUAL</span><h2>Character Gallery</h2><p>Existing image assets reframed as a visual playground.</p><div class="card-foot"><span class="meta">Existing assets</span><a class="text-link" href="/projects/character-gallery">Explore →</a></div></article><article class="card"><span class="tag">NEXT</span><h2>Experiment slot</h2><p>A reserved space for the next UI or JavaScript experiment. Add a real description when it exists.</p><div class="card-foot"><span class="meta">Coming later</span></div></article></section></main><div id="site-footer"></div><script src="/js/site.js" defer></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Small interactive experiments exploring motion, interaction and browser behaviour by Adarsh Kumar.">
+<meta name="theme-color" content="#07080c">
+<title>Labs — Adarsh Kumar</title>
+<link rel="icon" type="image/svg+xml" href="/assets/adarsh-a-favicon.svg">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/labs-tools.css">
+</head>
+<body>
+<div id="site-nav"></div>
+<main>
+<header class="page-hero platform-hero shell">
+  <div class="platform-kicker"><span class="eyebrow">LABS / 03 EXPERIMENTS</span><span class="platform-index">01 — 03</span></div>
+  <h1>Small experiments.<br><em>Real behaviour.</em></h1>
+  <p class="platform-lede">Small experiments where I explore interaction, motion and browser behaviour.</p>
+</header>
+<section class="section shell" aria-labelledby="labs-list-title">
+  <div class="platform-section-head"><div><span class="eyebrow">INTERACTIVE WORKBENCH</span><h2 id="labs-list-title">Explore the experiments.</h2></div><p>Each lab is deliberately small: one interaction, one idea, one place to test how it feels.</p></div>
+  <div class="platform-grid">
+    <article class="platform-card js-reveal">
+      <div class="platform-card-top"><span class="tag">EXPERIMENT</span><span class="platform-status">LIVE</span><span class="platform-number">01</span></div>
+      <div class="lab-swatch lab-swatch-liquid" aria-hidden="true"><span>A</span><i></i></div>
+      <h3>Liquid Interaction</h3><p>Pointer velocity drives a soft, local distortion around the supplied A visual.</p>
+      <div class="tag-row"><span>Canvas</span><span>Pointer Events</span><span>rAF</span></div>
+      <div class="platform-card-foot"><span class="meta">Visual / interaction</span><a class="text-link" href="/labs/liquid-interaction">Explore experiment →</a></div>
+    </article>
+    <article class="platform-card js-reveal">
+      <div class="platform-card-top"><span class="tag">PROTOTYPE</span><span class="platform-status">LIVE</span><span class="platform-number">02</span></div>
+      <div class="lab-swatch lab-swatch-magnetic" aria-hidden="true"><span>MOVE</span><i></i></div>
+      <h3>Magnetic UI</h3><p>A restrained spring model pulls controls toward the pointer, then lets them settle back.</p>
+      <div class="tag-row"><span>Pointer Events</span><span>Spring</span><span>CSS Transform</span></div>
+      <div class="platform-card-foot"><span class="meta">Motion / physics</span><a class="text-link" href="/labs/magnetic-ui">Explore experiment →</a></div>
+    </article>
+    <article class="platform-card js-reveal">
+      <div class="platform-card-top"><span class="tag">INTERACTIVE</span><span class="platform-status">LIVE</span><span class="platform-number">03</span></div>
+      <div class="lab-swatch lab-swatch-scroll" aria-hidden="true"><span>SCROLL</span><i></i><b></b></div>
+      <h3>Scroll Interaction Playground</h3><p>A compact study in progressive reveal, depth and scroll-linked movement without hijacking the page.</p>
+      <div class="tag-row"><span>IntersectionObserver</span><span>rAF</span><span>Transforms</span></div>
+      <div class="platform-card-foot"><span class="meta">Scroll / browser APIs</span><a class="text-link" href="/labs/scroll-playground">Explore experiment →</a></div>
+    </article>
+  </div>
+</section>
+<section class="platform-band" aria-label="Labs principle"><div class="shell platform-band-inner"><span class="eyebrow">LAB NOTE</span><p>Experiments are where interaction ideas get tested before they become patterns.</p></div></section>
+</main>
+<div id="site-footer"></div>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

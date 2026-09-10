@@ -10,10 +10,15 @@ const ROUTES = new Map([
   ["/", "index.html"], ["/projects", "projects/index.html"], ["/labs", "labs/index.html"],
   ["/tools", "tools/index.html"], ["/stack", "stack/index.html"], ["/blog", "blog/index.html"], ["/about", "about/index.html"],
   ["/contact", "contact/index.html"], ["/stats", "stats/index.html"], ["/todo", "todo-app/index.html"],
+  ["/labs/liquid-interaction", "labs/liquid-interaction/index.html"],
+  ["/labs/magnetic-ui", "labs/magnetic-ui/index.html"],
+  ["/labs/scroll-playground", "labs/scroll-playground/index.html"],
+  ["/tools/json", "tools/json/index.html"],
+  ["/tools/image-optimizer", "tools/image-optimizer/index.html"],
+  ["/tools/gradient-generator", "tools/gradient-generator/index.html"],
   ["/projects/anshika-studio", "projects/anshika-studio.html"],
   ["/projects/todo-app", "projects/todo-app.html"],
   ["/projects/previous-portfolio", "projects/previous-portfolio.html"],
-  ["/projects/character-gallery", "projects/character-gallery.html"],
   ["/projects/sih-2026", "projects/sih-2026.html"],
   ["/archive/previous-portfolio", "archive/previous-portfolio/index.html"]
 ]);
@@ -47,7 +52,8 @@ function serveFile(req,res,filePath) {
 }
 function handler(req,res) {
   if(req.method!=="GET" && req.method!=="HEAD"){res.writeHead(405,{...SECURITY_HEADERS,Allow:"GET, HEAD","Content-Type":"text/plain; charset=utf-8"});return res.end("Method Not Allowed")}
-  const pathname=new URL(req.url,"http://localhost").pathname.replace(/\/$/,"")||"/";
+  let pathname;
+  try { pathname = new URL(req.url,"http://localhost").pathname.replace(/\/$/,"")||"/"; } catch { return send404(req,res); }
   const filePath=safePath(pathname);
   if(!filePath) return send404(req,res);
   serveFile(req,res,filePath);
