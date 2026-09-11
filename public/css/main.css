@@ -1958,3 +1958,14 @@ body::after{
   .build-intro{padding-bottom:24px}
   .philosophy-copy .principle{grid-template-columns:38px minmax(0,1fr);gap:14px;padding:20px 0}
 }
+
+
+/* Keep the principle's text wrapper neutral; only the top-level rows carry interaction. */
+.philosophy-copy .principle>div{
+  display:block;
+  padding:0;
+  border:0;
+  transition:none;
+}
+.philosophy-copy .principle>div::before{content:none}
+.philosophy-copy .principle>div:hover{padding-left:0}
