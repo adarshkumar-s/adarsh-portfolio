@@ -116,7 +116,7 @@
     brand.textContent = "Adarsh Kumar";
 
     const note = document.createElement("p");
-    note.textContent = "Projects, experiments, tools and notes.";
+    note.textContent = "Things I build, test, keep, and learn from.";
 
     identity.append(brand, note);
 
