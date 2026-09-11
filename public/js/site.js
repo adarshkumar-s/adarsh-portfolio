@@ -425,7 +425,6 @@
 
     const markCloneAccessible = card => {
       card.setAttribute("aria-hidden", "true");
-      card.setAttribute("inert", "");
       card.querySelectorAll("a,button,input,textarea,select,[tabindex]").forEach(control => {
         control.setAttribute("tabindex", "-1");
       });
