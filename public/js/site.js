@@ -431,9 +431,7 @@
       clearClones();
 
       const first = originalCards[0];
-      const second = originalCards[1];
       const firstLeft = first.getBoundingClientRect().left;
-      const secondLeft = second.getBoundingClientRect().left;
       const firstSetWidth =
         originalCards[originalCount - 1].getBoundingClientRect().right - firstLeft;
 
