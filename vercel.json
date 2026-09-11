@@ -33,6 +33,7 @@
     { "source": "/labs/liquid-interaction", "destination": "/labs/liquid-interaction/index.html" },
     { "source": "/labs/magnetic-ui", "destination": "/labs/magnetic-ui/index.html" },
     { "source": "/labs/scroll-playground", "destination": "/labs/scroll-playground/index.html" },
+    { "source": "/labs/velocity-sparks", "destination": "/labs/velocity-sparks/index.html" },
     { "source": "/tools/json", "destination": "/tools/json/index.html" },
     { "source": "/tools/image-optimizer", "destination": "/tools/image-optimizer/index.html" },
     { "source": "/tools/gradient-generator", "destination": "/tools/gradient-generator/index.html" },
