@@ -17,18 +17,17 @@
     return;
   }
 
-  const dpr = () => Math.min(window.devicePixelRatio || 1, 2);
-  const MAX_PARTICLES = 120;
-  const particles = Array.from({ length: MAX_PARTICLES }, () => ({ active: false }));
+  const MAX_SPARKS = 96;
+  const sparks = Array.from({ length: MAX_SPARKS }, () => ({ active: false, points: [] }));
 
   const state = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    pixelRatio: dpr(),
-    x: window.innerWidth * 0.5,
-    y: window.innerHeight * 0.5,
-    previousX: window.innerWidth * 0.5,
-    previousY: window.innerHeight * 0.5,
+    width: innerWidth,
+    height: innerHeight,
+    dpr: 1,
+    x: innerWidth * 0.5,
+    y: innerHeight * 0.5,
+    previousX: innerWidth * 0.5,
+    previousY: innerHeight * 0.5,
     speed: 0,
     targetSpeed: 0,
     directionX: 0,
@@ -42,167 +41,211 @@
     raf: 0
   };
 
-  // px/ms thresholds keep the response tied to physical pointer speed, not event frequency.
-  const SPEED_MEDIUM = 0.45;
-  const SPEED_FAST = 1.05;
-  const SPEED_EXTREME = 2.0;
+  // px/ms: movement speed, not mouse-event frequency.
+  const NORMAL = 0.35;
+  const FAST = 0.9;
+  const EXTREME = 1.8;
 
   function resize() {
-    state.width = window.innerWidth;
-    state.height = window.innerHeight;
-    state.pixelRatio = dpr();
-    canvas.width = Math.round(state.width * state.pixelRatio);
-    canvas.height = Math.round(state.height * state.pixelRatio);
+    state.width = innerWidth;
+    state.height = innerHeight;
+    state.dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = Math.round(state.width * state.dpr);
+    canvas.height = Math.round(state.height * state.dpr);
     canvas.style.width = state.width + "px";
     canvas.style.height = state.height + "px";
-    ctx.setTransform(state.pixelRatio, 0, 0, state.pixelRatio, 0, 0);
+    ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
   }
 
   function resetPointer(x, y) {
     state.x = state.previousX = x;
     state.y = state.previousY = y;
-    state.targetSpeed = 0;
     state.speed = 0;
+    state.targetSpeed = 0;
     state.directionX = 0;
     state.directionY = 0;
     state.emissionCarry = 0;
   }
 
-  function acquireParticle() {
-    let candidate = null;
+  function acquireSpark() {
+    let oldest = null;
     let lowestLife = Infinity;
-    for (const particle of particles) {
-      if (!particle.active) return particle;
-      if (particle.life < lowestLife) {
-        lowestLife = particle.life;
-        candidate = particle;
+    for (const spark of sparks) {
+      if (!spark.active) return spark;
+      if (spark.life < lowestLife) {
+        lowestLife = spark.life;
+        oldest = spark;
       }
     }
-    return candidate;
+    return oldest;
+  }
+
+  function makeJaggedPath(spark, length, segments, angle, spread) {
+    spark.points.length = 0;
+    let x = 0;
+    let y = 0;
+    let heading = angle;
+    spark.points.push({ x, y });
+
+    for (let i = 0; i < segments; i += 1) {
+      heading += (Math.random() - 0.5) * spread;
+      const step = length / segments * (0.72 + Math.random() * 0.55);
+      x += Math.cos(heading) * step;
+      y += Math.sin(heading) * step;
+      spark.points.push({ x, y });
+    }
+
+    if (spark.branch) {
+      const index = 1 + Math.floor(Math.random() * Math.max(1, spark.points.length - 2));
+      const origin = spark.points[index];
+      spark.branchPoints.length = 0;
+      spark.branchPoints.push({ x: origin.x, y: origin.y });
+      let bx = origin.x;
+      let by = origin.y;
+      let branchHeading = heading + (Math.random() < 0.5 ? -1 : 1) * (0.75 + Math.random() * 0.7);
+
+      for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i += 1) {
+        branchHeading += (Math.random() - 0.5) * 0.65;
+        const step = length * (0.09 + Math.random() * 0.05);
+        bx += Math.cos(branchHeading) * step;
+        by += Math.sin(branchHeading) * step;
+        spark.branchPoints.push({ x: bx, y: by });
+      }
+    }
   }
 
   function emitSpark(energy, burst = false) {
-    const particle = acquireParticle();
-    if (!particle) return;
+    const spark = acquireSpark();
+    if (!spark) return;
 
-    // Bias particles opposite travel direction; controlled angular noise keeps the trail organic.
-    const angle = Math.atan2(state.directionY, state.directionX) + Math.PI +
-      (Math.random() - 0.5) * (burst ? 1.5 : 1.0);
-    const spread = burst ? 1.0 : 0.62;
-    const speed = (0.35 + energy * 1.25) * (0.65 + Math.random() * 0.7);
-    const size = (0.65 + Math.random() * 1.2) * (0.75 + energy * 0.6);
+    const travelAngle = Math.atan2(state.directionY, state.directionX);
+    // Electrical fragments are biased backward, with enough angular noise to stay organic.
+    const angle = travelAngle + Math.PI + (Math.random() - 0.5) * (burst ? 1.25 : 0.9);
+    const length = (3.5 + energy * 11) * (0.7 + Math.random() * 0.65);
+    const segments = burst
+      ? 4 + Math.floor(Math.random() * 4)
+      : 2 + Math.floor(Math.random() * (energy > 0.55 ? 4 : 3));
+    const velocity = (0.12 + energy * 0.62) * (0.7 + Math.random() * 0.6);
 
-    particle.active = true;
-    particle.x = state.x - state.directionX * (2 + Math.random() * 7);
-    particle.y = state.y - state.directionY * (2 + Math.random() * 7);
-    particle.vx = Math.cos(angle) * speed - state.directionX * energy * spread;
-    particle.vy = Math.sin(angle) * speed - state.directionY * energy * spread;
-    particle.size = size;
-    particle.opacity = 0.38 + Math.random() * 0.42 + energy * 0.2;
-    particle.life = particle.maxLife = (170 + Math.random() * 250) * (0.78 + energy * 0.28);
-    particle.drag = 0.955 + Math.random() * 0.018;
-    particle.trail = (2 + energy * 8) * (0.6 + Math.random() * 0.8);
+    spark.active = true;
+    spark.x = state.x - state.directionX * (2 + Math.random() * 7);
+    spark.y = state.y - state.directionY * (2 + Math.random() * 7);
+    spark.vx = Math.cos(angle) * velocity - state.directionX * energy * 0.42;
+    spark.vy = Math.sin(angle) * velocity - state.directionY * energy * 0.42;
+    spark.life = spark.maxLife = (75 + Math.random() * 105) * (0.88 + energy * 0.2);
+    spark.opacity = 0.42 + Math.random() * 0.42 + energy * 0.18;
+    spark.width = 0.55 + Math.random() * 0.75 + energy * 0.35;
+    spark.branch = energy > 0.72 && Math.random() < (burst ? 0.34 : 0.1 + energy * 0.12);
+    spark.branchPoints = spark.branchPoints || [];
+    spark.flickerAt = 0.18 + Math.random() * 0.42;
+    spark.flickerStrength = 0.45 + Math.random() * 0.4;
+    spark.glow = 1.5 + energy * 2.5;
+
+    makeJaggedPath(spark, length, segments, angle, 1.05 + energy * 0.42);
   }
 
   function emitFromVelocity(dt) {
-    const speed = state.speed;
-    if (!state.active || speed < 0.18) return;
+    if (!state.active || state.speed < 0.2) return;
 
-    const energy = Math.min(1, Math.max(0, (speed - 0.18) / 2.4));
-    // Emission is distance/time driven, rather than mouse-event-count driven.
-    const particlesPerSecond = speed < SPEED_MEDIUM
-      ? 7 * energy
-      : speed < SPEED_FAST
-        ? 16 + energy * 18
-        : 34 + energy * 30;
+    const energy = Math.min(1, Math.max(0, (state.speed - 0.2) / 2.2));
+    const rate = state.speed < NORMAL
+      ? 2 + energy * 5
+      : state.speed < FAST
+        ? 8 + energy * 13
+        : 20 + energy * 22;
 
-    state.emissionCarry += particlesPerSecond * (dt / 1000);
+    state.emissionCarry += rate * dt / 1000;
     while (state.emissionCarry >= 1) {
       emitSpark(energy);
       state.emissionCarry -= 1;
     }
 
-    if (speed >= SPEED_EXTREME && state.burstCooldown <= 0) {
-      const burstCount = Math.min(12, 5 + Math.round(energy * 7));
-      for (let i = 0; i < burstCount; i += 1) {
-        emitSpark(Math.min(1, energy + 0.15), true);
-      }
-      state.burstCooldown = 180;
+    if (state.speed >= EXTREME && state.burstCooldown <= 0) {
+      const count = Math.min(9, 4 + Math.round(energy * 5));
+      for (let i = 0; i < count; i += 1) emitSpark(Math.min(1, energy + 0.16), true);
+      state.burstCooldown = 210;
     }
   }
 
-  function updateParticles(dt) {
+  function updateSparks(dt) {
     const step = Math.min(2.2, dt / 16.67);
-    for (const particle of particles) {
-      if (!particle.active) continue;
-      particle.life -= dt;
-      if (particle.life <= 0) {
-        particle.active = false;
+    for (const spark of sparks) {
+      if (!spark.active) continue;
+      spark.life -= dt;
+      if (spark.life <= 0) {
+        spark.active = false;
         continue;
       }
-      particle.x += particle.vx * step;
-      particle.y += particle.vy * step;
-      const drag = Math.pow(particle.drag, step);
-      particle.vx *= drag;
-      particle.vy *= drag;
+      spark.x += spark.vx * step;
+      spark.y += spark.vy * step;
+      spark.vx *= Math.pow(0.93, step);
+      spark.vy *= Math.pow(0.93, step);
     }
   }
 
-  function renderParticles() {
+  function drawPath(points, spark, alpha, width) {
+    if (!points || points.length < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(spark.x + points[0].x, spark.y + points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+      ctx.lineTo(spark.x + points[i].x, spark.y + points[i].y);
+    }
+    ctx.strokeStyle = "rgba(255, 249, 232, " + alpha.toFixed(3) + ")";
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  function render() {
     ctx.clearRect(0, 0, state.width, state.height);
     ctx.globalCompositeOperation = "lighter";
+    ctx.lineCap = "square";
+    ctx.lineJoin = "miter";
 
-    for (const particle of particles) {
-      if (!particle.active) continue;
-      const lifeRatio = Math.max(0, Math.min(1, particle.life / particle.maxLife));
-      const fade = Math.sin(lifeRatio * Math.PI);
-      const alpha = particle.opacity * fade;
-      const speed = Math.hypot(particle.vx, particle.vy);
-      const trail = Math.min(16, particle.trail + speed * 2.2);
-      const angle = Math.atan2(particle.vy, particle.vx);
+    for (const spark of sparks) {
+      if (!spark.active) continue;
+      const ratio = Math.max(0, Math.min(1, spark.life / spark.maxLife));
+      const fade = Math.sin(ratio * Math.PI);
+      const flicker = ratio < spark.flickerAt
+        ? 0.55 + Math.random() * spark.flickerStrength
+        : 1;
+      const alpha = spark.opacity * fade * flicker;
 
-      ctx.globalAlpha = alpha * 0.82;
-      ctx.lineWidth = Math.max(0.7, particle.size * 0.72);
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(particle.x, particle.y);
-      ctx.lineTo(
-        particle.x - Math.cos(angle) * trail,
-        particle.y - Math.sin(angle) * trail
-      );
-      ctx.strokeStyle = "rgba(255, 246, 220, 0.92)";
-      ctx.stroke();
+      // A restrained glow under a much sharper electrical core.
+      ctx.shadowBlur = spark.glow;
+      ctx.shadowColor = "rgba(230, 210, 166, " + (alpha * 0.32).toFixed(3) + ")";
+      drawPath(spark.points, spark, alpha * 0.32, spark.width + 1.2);
 
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = "rgba(255, 255, 255, 0.98)";
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.shadowBlur = 0;
+      drawPath(spark.points, spark, alpha, spark.width);
+
+      if (spark.branch) {
+        drawPath(spark.branchPoints, spark, alpha * 0.68, Math.max(0.45, spark.width * 0.72));
+      }
     }
 
+    ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = "source-over";
   }
 
   function frame(now) {
     state.raf = 0;
-    if (document.hidden || !state.visible) return;
+    if (!state.visible) return;
 
     const dt = Math.min(34, Math.max(8, now - state.lastFrame));
     state.lastFrame = now;
-    state.speed += (state.targetSpeed - state.speed) * 0.16;
-    state.targetSpeed *= Math.pow(0.62, dt / 16.67);
+
+    state.speed += (state.targetSpeed - state.speed) * 0.17;
+    state.targetSpeed *= Math.pow(0.58, dt / 16.67);
     state.burstCooldown = Math.max(0, state.burstCooldown - dt);
 
     emitFromVelocity(dt);
-    updateParticles(dt);
-    renderParticles();
+    updateSparks(dt);
+    render();
 
-    const hasParticles = particles.some(particle => particle.active);
-    const stillMoving = state.active && (now - state.lastMove < 100);
-    if (hasParticles || stillMoving || state.speed > 0.02) {
-      state.raf = requestAnimationFrame(frame);
-    }
+    const alive = sparks.some(spark => spark.active);
+    const moving = state.active && now - state.lastMove < 90;
+    if (alive || moving || state.speed > 0.025) state.raf = requestAnimationFrame(frame);
   }
 
   function start() {
@@ -213,8 +256,8 @@
 
   function onPointerMove(event) {
     if (event.pointerType && event.pointerType !== "mouse") return;
-    const now = performance.now();
 
+    const now = performance.now();
     if (!state.active) {
       resetPointer(event.clientX, event.clientY);
       state.active = true;
@@ -228,8 +271,11 @@
     const distance = Math.hypot(dx, dy);
     const rawSpeed = Math.min(3.5, distance / elapsed);
 
-    state.directionX = distance > 0 ? dx / distance : state.directionX;
-    state.directionY = distance > 0 ? dy / distance : state.directionY;
+    if (distance > 0) {
+      state.directionX = dx / distance;
+      state.directionY = dy / distance;
+    }
+
     state.targetSpeed = rawSpeed;
     state.x = event.clientX;
     state.y = event.clientY;
@@ -239,7 +285,7 @@
     start();
   }
 
-  function onPointerLeave() {
+  function stopPointer() {
     state.active = false;
     state.targetSpeed = 0;
     state.emissionCarry = 0;
@@ -250,7 +296,7 @@
     if (!state.visible) {
       if (state.raf) cancelAnimationFrame(state.raf);
       state.raf = 0;
-      for (const particle of particles) particle.active = false;
+      for (const spark of sparks) spark.active = false;
       ctx.clearRect(0, 0, state.width, state.height);
       resetPointer(state.x, state.y);
       return;
@@ -260,11 +306,11 @@
   }
 
   resize();
-  window.addEventListener("resize", resize, { passive: true });
+  addEventListener("resize", resize, { passive: true });
   document.addEventListener("pointermove", onPointerMove, { passive: true });
-  window.addEventListener("mouseout", event => {
-    if (!event.relatedTarget) onPointerLeave();
+  addEventListener("mouseout", event => {
+    if (!event.relatedTarget) stopPointer();
   }, { passive: true });
+  addEventListener("blur", stopPointer, { passive: true });
   document.addEventListener("visibilitychange", onVisibilityChange);
-  window.addEventListener("blur", onPointerLeave, { passive: true });
 })();
