@@ -439,15 +439,6 @@
     railFrame = requestAnimationFrame(tick);
   }
   
-  /* ---------- global velocity spark layer ---------- */
-  if (!document.querySelector('script[data-velocity-sparks]')) {
-    const sparkScript = document.createElement("script");
-    sparkScript.src = "/js/velocity-sparks.js";
-    sparkScript.defer = true;
-    sparkScript.dataset.velocitySparks = "true";
-    document.head.appendChild(sparkScript);
-  }
-
   /* ---------- desktop cursor with context-aware states ---------- */
   if (!reduceMotion && finePointer) {
     const cursor = document.createElement("div");
