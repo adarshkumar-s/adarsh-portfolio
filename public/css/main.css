@@ -254,6 +254,165 @@ p{color:var(--muted)}
 .footer-bottom{display:flex;justify-content:space-between;gap:20px;margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:#60626b;font-size:.7rem}
 .error-page{width:min(calc(100% - var(--gutter)*2),800px);min-height:100svh;display:grid;align-content:center;margin-inline:auto}.error-page h1{margin:15px 0;font-size:clamp(5rem,12vw,11rem);line-height:.78}
 
+/* ---------- how I build / editorial principles ---------- */
+.philosophy-grid{
+  position:relative;
+  align-items:stretch;
+  overflow:hidden;
+}
+.philosophy-lead{
+  position:relative;
+  min-height:420px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.philosophy-lead h2{
+  position:relative;
+  z-index:1;
+  max-width:620px;
+  margin:clamp(35px,6vw,80px) 0 0;
+  font:400 clamp(4rem,7vw,8rem)/.8 Georgia,"Times New Roman",serif;
+  letter-spacing:-.075em;
+}
+.philosophy-signal{
+  position:absolute;
+  right:clamp(8px,3vw,42px);
+  top:50%;
+  width:min(240px,30vw);
+  height:150px;
+  transform:translateY(-50%);
+  opacity:.72;
+  pointer-events:none;
+}
+.philosophy-signal::before{
+  content:"";
+  position:absolute;
+  inset:15px 0;
+  border-block:1px solid var(--line);
+  background:linear-gradient(90deg,transparent,rgba(104,232,208,.05),transparent);
+}
+.philosophy-signal .signal-line{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:1px;
+  transform-origin:left center;
+  background:linear-gradient(90deg,rgba(104,232,208,.12),rgba(104,232,208,.48),transparent);
+}
+.philosophy-signal .signal-line:nth-child(1){top:38%;transform:scaleX(.76)}
+.philosophy-signal .signal-line:nth-child(2){top:50%;transform:scaleX(.94)}
+.philosophy-signal .signal-line:nth-child(3){top:62%;transform:scaleX(.58)}
+.philosophy-signal i{
+  position:absolute;
+  left:48%;
+  top:50%;
+  width:7px;
+  height:7px;
+  border:1px solid var(--accent-2);
+  border-radius:50%;
+  background:var(--bg);
+  box-shadow:0 0 18px rgba(104,232,208,.35);
+  transform:translate(-50%,-50%);
+}
+.philosophy-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  color:var(--faint);
+  font:700 .58rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.14em;
+}
+.philosophy-copy{
+  position:relative;
+  padding-top:8px;
+}
+.philosophy-copy::before{
+  content:"";
+  position:absolute;
+  left:-clamp(23px,4vw,65px);
+  top:0;
+  width:1px;
+  height:100%;
+  background:linear-gradient(var(--line-strong),transparent 90%);
+}
+.philosophy-copy .large-copy{
+  margin:0;
+}
+.principles{
+  position:relative;
+  margin-top:48px;
+}
+.principles div{
+  position:relative;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr);
+  gap:18px 20px;
+  padding:22px 0 21px;
+  transition:padding-left 450ms var(--ease),border-color 450ms var(--ease);
+}
+.principles div::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:-1px;
+  width:0;
+  height:1px;
+  background:var(--accent-2);
+  transition:width 500ms var(--ease);
+}
+.principles div:hover,
+.principles div:focus-within{
+  padding-left:10px;
+}
+.principles div:hover::before,
+.principles div:focus-within::before{
+  width:64px;
+}
+.principles span{
+  transition:color 250ms ease,text-shadow 250ms ease;
+}
+.principles div:hover span,
+.principles div:focus-within span{
+  color:var(--text);
+  text-shadow:0 0 16px rgba(104,232,208,.28);
+}
+.principles strong{
+  font-size:clamp(1rem,1.35vw,1.15rem);
+  font-weight:650;
+  letter-spacing:-.025em;
+}
+.principles small{
+  grid-column:2;
+  max-width:520px;
+  margin-top:-10px;
+  color:var(--faint);
+  font-size:.74rem;
+  line-height:1.6;
+  opacity:.9;
+}
+@media (max-width:900px){
+  .philosophy-lead{min-height:340px}
+  .philosophy-signal{right:0;width:34vw}
+}
+@media (max-width:700px){
+  .philosophy-lead{min-height:0;gap:28px}
+  .philosophy-signal{position:relative;right:auto;top:auto;transform:none;width:100%;height:82px;order:2}
+  .philosophy-lead h2{margin:0;order:1}
+  .philosophy-meta{order:3}
+  .philosophy-copy{padding-top:45px}
+  .philosophy-copy::before{left:0;top:20px;width:100%;height:1px;background:linear-gradient(90deg,var(--line-strong),transparent)}
+  .principles{margin-top:36px}
+}
+@media (prefers-reduced-motion:reduce){
+  .philosophy-signal .signal-line,
+  .principles div,
+  .principles div::before,
+  .principles span{transition:none!important}
+}
+
 /* ---------- reveal / cursor ---------- */
 .reveal{animation:rise 850ms var(--ease) both}@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 .js-reveal{opacity:0;transform:translateY(35px);transition:opacity 800ms var(--ease),transform 800ms var(--ease)}.js-reveal.is-visible{opacity:1;transform:none}
