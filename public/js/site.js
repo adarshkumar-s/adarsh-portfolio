@@ -498,4 +498,30 @@
       cursor.removeAttribute("data-label");
     }, { passive: true });
   }
+  /* ---------- How I Build: lightweight scroll-linked process state ---------- */
+  const buildProcess = document.querySelector("[data-build-process]");
+  if (buildProcess) {
+    const steps = Array.from(buildProcess.querySelectorAll("[data-build-step]"));
+    const progress = buildProcess.querySelector(".build-progress span");
+
+    const setActiveStep = index => {
+      steps.forEach((step, i) => step.classList.toggle("is-active", i === index));
+      if (progress) progress.style.height = ((index + 1) / steps.length * 100).toFixed(1) + "%";
+    };
+
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      setActiveStep(0);
+    } else {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const index = steps.indexOf(entry.target);
+          if (index >= 0) setActiveStep(index);
+        });
+      }, { threshold: 0.55, rootMargin: "-10% 0px -28% 0px" });
+
+      steps.forEach(step => observer.observe(step));
+    }
+  }
+
 })();
