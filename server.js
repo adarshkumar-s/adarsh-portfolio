@@ -16,6 +16,7 @@ const ROUTES = new Map([
   ["/labs/liquid-interaction", "labs/liquid-interaction/index.html"],
   ["/labs/magnetic-ui", "labs/magnetic-ui/index.html"],
   ["/labs/scroll-playground", "labs/scroll-playground/index.html"],
+  ["/labs/velocity-sparks", "labs/velocity-sparks/index.html"],
   ["/tools/json", "tools/json/index.html"],
   ["/tools/image-optimizer", "tools/image-optimizer/index.html"],
   ["/tools/gradient-generator", "tools/gradient-generator/index.html"],
