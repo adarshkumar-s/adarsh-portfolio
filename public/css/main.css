@@ -2097,3 +2097,60 @@ body::after{
 @media(prefers-reduced-motion:reduce){
   .build-progress span,.build-step,.build-step h3,.build-step p,.build-step-index i{transition:none!important}
 }
+
+
+/* ---------- About / profile copy presentation ---------- */
+.about-profile-copy{
+  position:relative;
+  max-width:720px;
+  margin:0;
+  padding:28px 0 30px 30px;
+  border-left:1px solid rgba(104,232,208,.34);
+  color:#deddd7;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(1.55rem,2.35vw,2.35rem);
+  line-height:1.2;
+  letter-spacing:-.045em;
+  text-wrap:balance;
+  background:linear-gradient(90deg,rgba(104,232,208,.035),transparent 48%);
+  transition:border-color 450ms var(--ease),padding-left 450ms var(--ease),background 450ms var(--ease);
+}
+.about-profile-copy::before{
+  content:"THE APPROACH";
+  position:absolute;
+  left:30px;
+  top:-9px;
+  padding-right:9px;
+  color:var(--accent-2);
+  background:var(--bg);
+  font:700 .52rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.16em;
+}
+.about-profile-copy::after{
+  content:"01";
+  position:absolute;
+  right:0;
+  bottom:-.16em;
+  color:rgba(255,255,255,.035);
+  font:400 clamp(4rem,8vw,7rem)/.75 Georgia,"Times New Roman",serif;
+  letter-spacing:-.08em;
+  pointer-events:none;
+  user-select:none;
+}
+.about-profile-copy:hover{
+  border-left-color:rgba(104,232,208,.62);
+  padding-left:38px;
+  background:linear-gradient(90deg,rgba(104,232,208,.06),transparent 55%);
+}
+@media(max-width:700px){
+  .about-profile-copy{
+    padding:24px 0 26px 22px;
+    font-size:clamp(1.35rem,5.8vw,1.8rem);
+    line-height:1.3;
+  }
+  .about-profile-copy::before{left:22px}
+  .about-profile-copy:hover{padding-left:27px}
+}
+@media(prefers-reduced-motion:reduce){
+  .about-profile-copy{transition:none}
+}
