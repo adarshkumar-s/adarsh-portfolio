@@ -405,40 +405,126 @@
     });
   }
 
-  /* ---------- seamless project rail: same continuous loop as the archived portfolio ---------- */
+  /* ---------- seamless project rail ---------- */
   const projectRail = document.querySelector("[data-infinite-project-rail]");
   if (projectRail && !reduceMotion && projectRail.children.length > 1) {
     const originalCards = Array.from(projectRail.children);
-    const gap = parseFloat(getComputedStyle(projectRail).columnGap || getComputedStyle(projectRail).gap || "0") || 0;
-    originalCards.forEach(card => projectRail.appendChild(card.cloneNode(true)));
-
+    const originalCount = originalCards.length;
     let loopWidth = 0;
     let offset = 0;
     let lastTime = performance.now();
     let railFrame = 0;
+    let resizeFrame = 0;
+    let cloneSets = [];
     const speed = 34;
 
-    const measureLoop = () => {
-      loopWidth = originalCards.reduce((total, card) => total + card.getBoundingClientRect().width, 0) + gap * Math.max(0, originalCards.length - 1);
-      if (loopWidth > 0) offset = ((offset % loopWidth) + loopWidth) % loopWidth;
+    const clearClones = () => {
+      cloneSets.forEach(set => set.forEach(card => card.remove()));
+      cloneSets = [];
+    };
+
+    const markCloneAccessible = card => {
+      card.setAttribute("aria-hidden", "true");
+      card.setAttribute("inert", "");
+      card.querySelectorAll("a,button,input,textarea,select,[tabindex]").forEach(control => {
+        control.setAttribute("tabindex", "-1");
+      });
+      card.classList.remove("js-reveal", "is-visible");
+      return card;
+    };
+
+    const buildTrack = () => {
+      clearClones();
+
+      /* Keep enough complete sequences in the track that the viewport can
+         never reach the end before an identical sequence is already present. */
+      const firstWidth = originalCards.reduce(
+        (sum, card) => sum + card.getBoundingClientRect().width,
+        0
+      );
+      const gapValue = getComputedStyle(projectRail).columnGap ||
+        getComputedStyle(projectRail).gap || "0px";
+      const gap = parseFloat(gapValue) || 0;
+      const sequenceWidth =
+        firstWidth + gap * Math.max(0, originalCount - 1);
+      const viewportWidth =
+        projectRail.parentElement?.getBoundingClientRect().width ||
+        window.innerWidth;
+      const setsNeeded = Math.max(
+        2,
+        Math.ceil((viewportWidth + sequenceWidth) / Math.max(1, sequenceWidth)) + 1
+      );
+
+      for (let setIndex = 1; setIndex < setsNeeded; setIndex += 1) {
+        const set = originalCards.map(card =>
+          markCloneAccessible(card.cloneNode(true))
+        );
+        set.forEach(card => projectRail.appendChild(card));
+        cloneSets.push(set);
+      }
+
+      /* The real flex position of the first card in sequence 2 gives the
+         exact recycle distance, including the inter-sequence gap. */
+      if (projectRail.children[originalCount]) {
+        const first = originalCards[0].getBoundingClientRect();
+        const secondSetFirst =
+          projectRail.children[originalCount].getBoundingClientRect();
+        loopWidth = secondSetFirst.left - first.left;
+      } else {
+        loopWidth = sequenceWidth + gap;
+      }
+
+      if (loopWidth > 0) {
+        offset = -(((-offset % loopWidth) + loopWidth) % loopWidth);
+      }
+    };
+
+    const scheduleMeasure = () => {
+      if (resizeFrame) return;
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = 0;
+        buildTrack();
+      });
     };
 
     const tick = now => {
-      const dt = Math.min(40, Math.max(8, now - lastTime));
+      const dt = Math.min(50, Math.max(0, now - lastTime));
       lastTime = now;
+
       if (loopWidth > 0) {
         offset -= speed * (dt / 1000);
         if (offset <= -loopWidth) offset += loopWidth;
-        projectRail.style.transform = "translate3d(" + offset.toFixed(2) + "px,0,0)";
+        projectRail.style.transform =
+          `translate3d(${offset.toFixed(2)}px,0,0)`;
       }
+
       railFrame = requestAnimationFrame(tick);
     };
 
-    measureLoop();
-    window.addEventListener("resize", measureLoop, { passive: true });
+    buildTrack();
+
+    const resizeObserver =
+      "ResizeObserver" in window ? new ResizeObserver(scheduleMeasure) : null;
+    if (resizeObserver) {
+      resizeObserver.observe(projectRail.parentElement || projectRail);
+    }
+    window.addEventListener("resize", scheduleMeasure, { passive: true });
+
+    const visibilityHandler = () => {
+      if (document.hidden) {
+        if (railFrame) cancelAnimationFrame(railFrame);
+        railFrame = 0;
+      } else if (!railFrame) {
+        lastTime = performance.now();
+        railFrame = requestAnimationFrame(tick);
+      }
+    };
+    document.addEventListener("visibilitychange", visibilityHandler, {
+      passive: true
+    });
+
     railFrame = requestAnimationFrame(tick);
-  }
-  
+  }  
   /* ---------- desktop cursor with context-aware states ---------- */
   if (!reduceMotion && finePointer) {
     const cursor = document.createElement("div");
