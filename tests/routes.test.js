@@ -120,14 +120,6 @@ assert.ok(!rewriteSources.has("/projects/todo-app"));
 assert.match(vercel.headers[0].headers.find(h => h.key === "Content-Security-Policy").value, /cdn\.jsdelivr\.net/);
 const siteJs = fs.readFileSync(path.join(root, "public/js/site.js"), "utf8");
 assert.doesNotMatch(siteJs, /velocity-sparks\.js|velocitySparks|initVelocitySparks/);
-const sparksJs = "";
-
-
-
-assert.match(sparksJs, /MAX_ARCS = 42|MAX_ARCS = 72/);\nassert.match(sparksJs, /generateLightning/);\nassert.match(sparksJs, /branch2/);\nassert.match(sparksJs, /strokeLightning/);
-assert.match(sparksJs, /distance \/ elapsed/);
-assert.match(sparksJs, /pointermove/);
-
 const child = spawn(process.execPath, ["server.js"], {env: {...process.env, PORT: "3219"}});
 const get = route => new Promise((resolve, reject) => {
   const req = http.get("http://127.0.0.1:3219" + route, res => {
