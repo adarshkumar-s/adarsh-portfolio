@@ -1917,12 +1917,20 @@ body::after{
   width:max-content;
   will-change:transform;
   overflow:visible;
+  animation:projectRailLoop var(--project-loop-duration, 30s) linear infinite;
 }
 [data-infinite-project-rail] > .old-style-project{
   flex-shrink:0;
 }
+@keyframes projectRailLoop{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(calc(-1 * var(--project-loop-width)),0,0)}
+}
 @media(prefers-reduced-motion:reduce){
-  [data-infinite-project-rail]{transform:none!important}
+  [data-infinite-project-rail]{
+    animation:none!important;
+    transform:none!important;
+  }
 }
 
 /* How I Build — editorial right column */
