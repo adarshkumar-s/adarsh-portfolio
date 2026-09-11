@@ -1950,3 +1950,150 @@ body::after{
 }
 .philosophy-copy .principle>div::before{content:none}
 .philosophy-copy .principle>div:hover{padding-left:0}
+
+
+/* ---------- How I Build / editorial process ---------- */
+.philosophy-grid{
+  align-items:start;
+}
+.philosophy-copy{
+  padding-top:0;
+}
+.philosophy-copy::before{display:none}
+.build-process-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:22px;
+  align-items:end;
+  padding:0 0 30px;
+  border-bottom:1px solid var(--line);
+}
+.build-process-kicker{
+  color:var(--faint);
+  font:700 .58rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.16em;
+}
+.build-process-intro{
+  max-width:650px;
+  margin:0;
+  color:#d0d0ca;
+  font-size:clamp(1.05rem,1.55vw,1.35rem);
+  line-height:1.52;
+  letter-spacing:-.025em;
+}
+.build-process{
+  position:relative;
+  padding:9px 0 0 62px;
+}
+.build-progress{
+  position:absolute;
+  left:17px;
+  top:14px;
+  bottom:30px;
+  width:1px;
+  overflow:hidden;
+  background:rgba(255,255,255,.09);
+}
+.build-progress span{
+  display:block;
+  width:100%;
+  height:25%;
+  background:linear-gradient(180deg,var(--accent-2),rgba(104,232,208,.1));
+  transform-origin:top;
+  transition:height 700ms var(--ease);
+  box-shadow:0 0 14px rgba(104,232,208,.22);
+}
+.build-step{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  padding:28px 0 29px;
+  border-bottom:1px solid var(--line);
+  transition:padding-left 450ms var(--ease);
+}
+.build-step:last-child{border-bottom:0}
+.build-step-index{
+  position:absolute;
+  left:-62px;
+  top:28px;
+  width:35px;
+  display:flex;
+  justify-content:center;
+  color:var(--faint);
+  font:700 .58rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.08em;
+}
+.build-step-index i{
+  position:absolute;
+  left:50%;
+  top:15px;
+  width:7px;
+  height:7px;
+  border:1px solid #555861;
+  border-radius:50%;
+  background:var(--bg);
+  transform:translate(-50%,-50%);
+  transition:border-color 350ms var(--ease),background 350ms var(--ease),box-shadow 350ms var(--ease),transform 450ms var(--ease);
+}
+.build-step-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:8px;
+  color:var(--faint);
+  font:700 .55rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.15em;
+}
+.build-step-meta span:first-child{color:#7f8189}
+.build-step-meta span:last-child{opacity:.55}
+.build-step h3{
+  margin:0 0 8px;
+  color:#b7b8bd;
+  font:400 clamp(1.65rem,2.5vw,2.45rem)/.95 Georgia,"Times New Roman",serif;
+  letter-spacing:-.06em;
+  transition:color 350ms var(--ease),transform 450ms var(--ease);
+}
+.build-step p{
+  max-width:610px;
+  margin:0;
+  color:var(--faint);
+  font-size:.78rem;
+  line-height:1.68;
+  transition:color 350ms var(--ease);
+}
+.build-step.is-active h3,
+.build-step:hover h3,
+.build-step:focus-within h3{color:var(--text);transform:translateX(4px)}
+.build-step.is-active p,
+.build-step:hover p,
+.build-step:focus-within p{color:#9698a1}
+.build-step.is-active .build-step-index{color:var(--accent-2)}
+.build-step.is-active .build-step-index i,
+.build-step:hover .build-step-index i,
+.build-step:focus-within .build-step-index i{
+  border-color:var(--accent-2);
+  background:var(--bg);
+  box-shadow:0 0 15px rgba(104,232,208,.35);
+  transform:translate(-50%,-50%) scale(1.25);
+}
+.build-step:hover,
+.build-step:focus-within{padding-left:8px}
+@media(max-width:980px){
+  .build-process-head{grid-template-columns:1fr;gap:12px}
+  .build-process{padding-left:56px}
+  .build-step-index{left:-56px}
+}
+@media(max-width:700px){
+  .build-process-head{padding-bottom:24px}
+  .build-process-intro{font-size:1rem;line-height:1.62}
+  .build-process{padding-left:45px}
+  .build-progress{left:13px}
+  .build-step-index{left:-45px;top:25px}
+  .build-step{padding:25px 0}
+  .build-step:hover,.build-step:focus-within{padding-left:4px}
+  .build-step h3{font-size:1.65rem}
+  .build-step p{font-size:.75rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .build-progress span,.build-step,.build-step h3,.build-step p,.build-step-index i{transition:none!important}
+}
