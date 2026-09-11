@@ -56,9 +56,20 @@ const homepage = fs.readFileSync(path.join(root, "public/index.html"), "utf8");
 assert.match(homepage, /hero-quote/);
 assert.match(homepage, /data-infinite-project-rail/);
 assert.match(homepage, /Anshika Studio/);
-assert.match(homepage, /Previous Portfolio/);
 assert.match(homepage, /SIH 2026/);
-assert.doesNotMatch(homepage, /Todo App|todo-app|\/todo\b/i);
+assert.match(homepage, /Todo App/);
+assert.match(homepage, /Previous Portfolio/);
+
+const marqueeOrder = [
+  homepage.indexOf("<h3>Anshika Studio</h3>"),
+  homepage.indexOf("<h3>SIH 2026</h3>"),
+  homepage.indexOf("<h3>Todo App</h3>"),
+  homepage.indexOf("<h3>Previous Portfolio</h3>")
+];
+assert.ok(marqueeOrder.every((position, index) =>
+  position >= 0 && (index === 0 || position > marqueeOrder[index - 1])
+), "homepage project marquee order should be Anshika Studio → SIH 2026 → Todo App → Previous Portfolio");
+
 assert.doesNotMatch(homepage, /Character Gallery|character-gallery/);
 
 const mainCss = fs.readFileSync(path.join(root, "public/css/main.css"), "utf8");
