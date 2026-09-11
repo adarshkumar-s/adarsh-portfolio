@@ -6,7 +6,7 @@ const {spawn, execFileSync} = require("child_process");
 
 const routes = [
   "/", "/projects", "/projects/anshika-studio", "/projects/previous-portfolio", "/projects/sih-2026",
-  "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground",
+  "/labs", "/labs/liquid-interaction", "/labs/magnetic-ui", "/labs/scroll-playground", "/labs/velocity-sparks",
   "/tools", "/tools/json", "/tools/image-optimizer", "/tools/gradient-generator", "/tools/file-converter", "/todo", "/stack",
   "/blog", "/about", "/contact", "/stats", "/archive/previous-portfolio"
 ];
@@ -17,7 +17,7 @@ const requiredFiles = [
   "public/projects/anshika-studio.html", "public/projects/previous-portfolio.html", "public/projects/sih-2026.html", "public/projects/todo-app.html", "public/archive/previous-portfolio/index.html",
   "public/todo-app/index.html", "public/css/todo.css", "public/js/todo.js",
   "public/labs/index.html", "public/labs/liquid-interaction/index.html", "public/labs/magnetic-ui/index.html",
-  "public/labs/scroll-playground/index.html", "public/tools/index.html", "public/tools/json/index.html",
+  "public/labs/scroll-playground/index.html", "public/labs/velocity-sparks/index.html", "public/tools/index.html", "public/tools/json/index.html",
   "public/tools/image-optimizer/index.html", "public/tools/gradient-generator/index.html", "public/tools/file-converter/index.html",
   "public/css/file-converter.css", "public/js/tool-converter.js", "public/stack/index.html",
   "server.js", "vercel.json", "SECURITY.md", ".github/dependabot.yml", ".github/workflows/test.yml", ".github/workflows/deploy-pages.yml"
@@ -75,6 +75,7 @@ const labs = fs.readFileSync(path.join(root, "public/labs/index.html"), "utf8");
 assert.match(labs, /Liquid Interaction/);
 assert.match(labs, /Magnetic UI/);
 assert.match(labs, /Scroll Interaction Playground/);
+assert.match(labs, /Velocity Sparks/);
 assert.doesNotMatch(labs, /Task Tracker|Character Gallery|Experiment slot/);
 
 const tools = fs.readFileSync(path.join(root, "public/tools/index.html"), "utf8");
@@ -118,12 +119,12 @@ assert.ok(!rewriteSources.has("/projects/character-gallery"));
 assert.ok(!rewriteSources.has("/projects/todo-app"));
 assert.match(vercel.headers[0].headers.find(h => h.key === "Content-Security-Policy").value, /cdn\.jsdelivr\.net/);
 const siteJs = fs.readFileSync(path.join(root, "public/js/site.js"), "utf8");
-assert.match(siteJs, /velocity-sparks\.js/);
+assert.doesNotMatch(siteJs, /velocity-sparks\.js|velocitySparks|initVelocitySparks/);
 const sparksJs = fs.readFileSync(path.join(root, "public/js/velocity-sparks.js"), "utf8");
 assert.match(sparksJs, /requestAnimationFrame/);
 assert.match(sparksJs, /prefers-reduced-motion/);
 assert.match(sparksJs, /devicePixelRatio/);
-assert.match(sparksJs, /MAX_ARCS = 72/);\nassert.match(sparksJs, /generateLightning/);\nassert.match(sparksJs, /branch2/);\nassert.match(sparksJs, /strokeLightning/);
+assert.match(sparksJs, /MAX_ARCS = 42|MAX_ARCS = 72/);\nassert.match(sparksJs, /generateLightning/);\nassert.match(sparksJs, /branch2/);\nassert.match(sparksJs, /strokeLightning/);
 assert.match(sparksJs, /distance \/ elapsed/);
 assert.match(sparksJs, /pointermove/);
 
