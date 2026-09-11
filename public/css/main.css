@@ -2154,3 +2154,17 @@ body::after{
 @media(prefers-reduced-motion:reduce){
   .about-profile-copy{transition:none}
 }
+
+
+/* ---------- infinite project rail: internal overflow only ---------- */
+@media(max-width:980px){
+  .project-rail{
+    width:max-content;
+    max-width:none;
+    overflow:visible;
+    scroll-snap-type:none;
+    padding-right:0;
+    margin-right:0;
+  }
+  .old-style-project{scroll-snap-align:none}
+}
