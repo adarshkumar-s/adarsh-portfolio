@@ -18,33 +18,22 @@
   }
 
   const MAX_SPARKS = 96;
-  const sparks = Array.from({ length: MAX_SPARKS }, () => ({ active: false, points: [] }));
+  const sparks = Array.from({ length: MAX_SPARKS }, () => ({
+    active: false, points: [], branchPoints: [], branch2Points: []
+  }));
 
   const state = {
-    width: innerWidth,
-    height: innerHeight,
-    dpr: 1,
-    x: innerWidth * 0.5,
-    y: innerHeight * 0.5,
-    previousX: innerWidth * 0.5,
-    previousY: innerHeight * 0.5,
-    speed: 0,
-    targetSpeed: 0,
-    directionX: 0,
-    directionY: 0,
-    active: false,
-    visible: !document.hidden,
-    lastMove: 0,
-    lastFrame: performance.now(),
-    emissionCarry: 0,
-    burstCooldown: 0,
-    raf: 0
+    width: innerWidth, height: innerHeight, dpr: 1,
+    x: innerWidth * 0.5, y: innerHeight * 0.5,
+    previousX: innerWidth * 0.5, previousY: innerHeight * 0.5,
+    speed: 0, targetSpeed: 0, directionX: 0, directionY: 0,
+    active: false, visible: !document.hidden, lastMove: 0,
+    lastFrame: performance.now(), emissionCarry: 0, burstCooldown: 0, raf: 0
   };
 
-  // px/ms: movement speed, not mouse-event frequency.
-  const NORMAL = 0.35;
-  const FAST = 0.9;
-  const EXTREME = 1.8;
+  const NORMAL = 0.32;
+  const FAST = 0.72;
+  const EXTREME = 1.45;
 
   function resize() {
     state.width = innerWidth;
@@ -60,110 +49,105 @@
   function resetPointer(x, y) {
     state.x = state.previousX = x;
     state.y = state.previousY = y;
-    state.speed = 0;
-    state.targetSpeed = 0;
-    state.directionX = 0;
-    state.directionY = 0;
+    state.speed = state.targetSpeed = 0;
+    state.directionX = state.directionY = 0;
     state.emissionCarry = 0;
   }
 
   function acquireSpark() {
-    let oldest = null;
-    let lowestLife = Infinity;
-    for (const spark of sparks) {
-      if (!spark.active) return spark;
-      if (spark.life < lowestLife) {
-        lowestLife = spark.life;
-        oldest = spark;
-      }
-    }
+    for (const spark of sparks) if (!spark.active) return spark;
+    let oldest = sparks[0];
+    for (const spark of sparks) if (spark.life < oldest.life) oldest = spark;
     return oldest;
   }
 
-  function makeJaggedPath(spark, length, segments, angle, spread) {
-    spark.points.length = 0;
-    let x = 0;
-    let y = 0;
-    let heading = angle;
-    spark.points.push({ x, y });
-
+  function buildPath(points, length, segments, angle, energy, branch) {
+    points.length = 0;
+    let x = 0, y = 0, heading = angle;
+    points.push({ x, y });
     for (let i = 0; i < segments; i += 1) {
-      heading += (Math.random() - 0.5) * spread;
-      const step = length / segments * (0.72 + Math.random() * 0.55);
+      // Sharp, controlled angular changes produce a crystalline lightning silhouette.
+      heading += (Math.random() - 0.5) * (1.35 + energy * 0.55);
+      const step = length / segments * (0.68 + Math.random() * 0.58);
       x += Math.cos(heading) * step;
       y += Math.sin(heading) * step;
-      spark.points.push({ x, y });
+      points.push({ x, y });
     }
+    if (branch) buildBranch(points, branch.points, branch.index, length, angle, energy);
+  }
 
-    if (spark.branch) {
-      const index = 1 + Math.floor(Math.random() * Math.max(1, spark.points.length - 2));
-      const origin = spark.points[index];
-      spark.branchPoints.length = 0;
-      spark.branchPoints.push({ x: origin.x, y: origin.y });
-      let bx = origin.x;
-      let by = origin.y;
-      let branchHeading = heading + (Math.random() < 0.5 ? -1 : 1) * (0.75 + Math.random() * 0.7);
-
-      for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i += 1) {
-        branchHeading += (Math.random() - 0.5) * 0.65;
-        const step = length * (0.09 + Math.random() * 0.05);
-        bx += Math.cos(branchHeading) * step;
-        by += Math.sin(branchHeading) * step;
-        spark.branchPoints.push({ x: bx, y: by });
-      }
+  function buildBranch(main, out, index, length, angle, energy) {
+    const origin = main[Math.min(index, main.length - 1)];
+    out.length = 0;
+    out.push({ x: origin.x, y: origin.y });
+    let x = origin.x, y = origin.y;
+    let heading = angle + (Math.random() < 0.5 ? -1 : 1) * (0.72 + Math.random() * 0.7);
+    const count = 2 + Math.floor(Math.random() * (energy > 0.9 ? 3 : 2));
+    for (let i = 0; i < count; i += 1) {
+      heading += (Math.random() - 0.5) * 0.9;
+      const step = length * (0.075 + Math.random() * 0.055);
+      x += Math.cos(heading) * step;
+      y += Math.sin(heading) * step;
+      out.push({ x, y });
     }
   }
 
   function emitSpark(energy, burst = false) {
     const spark = acquireSpark();
-    if (!spark) return;
-
     const travelAngle = Math.atan2(state.directionY, state.directionX);
-    // Electrical fragments are biased backward, with enough angular noise to stay organic.
-    const angle = travelAngle + Math.PI + (Math.random() - 0.5) * (burst ? 1.25 : 0.9);
-    const length = (3.5 + energy * 11) * (0.7 + Math.random() * 0.65);
-    const segments = burst
-      ? 4 + Math.floor(Math.random() * 4)
-      : 2 + Math.floor(Math.random() * (energy > 0.55 ? 4 : 3));
-    const velocity = (0.12 + energy * 0.62) * (0.7 + Math.random() * 0.6);
+    const angle = travelAngle + Math.PI + (Math.random() - 0.5) * (burst ? 1.35 : 1.0);
+    const high = energy > 0.68;
+    const length = (4 + Math.pow(energy, 1.35) * (burst ? 25 : 20)) * (0.72 + Math.random() * 0.62);
+    const segments = burst ? 6 + Math.floor(Math.random() * 5) : 2 + Math.floor(Math.random() * (high ? 7 : 3));
+    const branchChance = energy < 0.45 ? 0 : energy < 0.7 ? 0.08 : energy < 0.9 ? 0.24 : 0.42;
 
     spark.active = true;
-    spark.x = state.x - state.directionX * (2 + Math.random() * 7);
-    spark.y = state.y - state.directionY * (2 + Math.random() * 7);
-    spark.vx = Math.cos(angle) * velocity - state.directionX * energy * 0.42;
-    spark.vy = Math.sin(angle) * velocity - state.directionY * energy * 0.42;
-    spark.life = spark.maxLife = (75 + Math.random() * 105) * (0.88 + energy * 0.2);
-    spark.opacity = 0.42 + Math.random() * 0.42 + energy * 0.18;
-    spark.width = 0.55 + Math.random() * 0.75 + energy * 0.35;
-    spark.branch = energy > 0.72 && Math.random() < (burst ? 0.34 : 0.1 + energy * 0.12);
-    spark.branchPoints = spark.branchPoints || [];
-    spark.flickerAt = 0.18 + Math.random() * 0.42;
-    spark.flickerStrength = 0.45 + Math.random() * 0.4;
-    spark.glow = 1.5 + energy * 2.5;
+    spark.x = state.x - state.directionX * (2 + Math.random() * 8);
+    spark.y = state.y - state.directionY * (2 + Math.random() * 8);
+    spark.vx = Math.cos(angle) * (0.16 + energy * 0.7) - state.directionX * energy * 0.32;
+    spark.vy = Math.sin(angle) * (0.16 + energy * 0.7) - state.directionY * energy * 0.32;
+    spark.life = spark.maxLife = (52 + Math.random() * 78) * (0.88 + energy * 0.18);
+    spark.opacity = 0.55 + Math.random() * 0.3 + energy * 0.16;
+    spark.width = 0.52 + Math.random() * 0.58 + energy * 0.3;
+    spark.flickerAt = 0.2 + Math.random() * 0.35;
+    spark.flickerStrength = 0.25 + Math.random() * 0.42;
+    spark.glow = 2 + energy * 3;
+    spark.branch = Math.random() < branchChance;
+    spark.branch2 = spark.branch && energy > 0.9 && Math.random() < 0.18;
 
-    makeJaggedPath(spark, length, segments, angle, 1.05 + energy * 0.42);
+    buildPath(spark.points, length, segments, angle, energy, spark.branch ? {
+      points: spark.branchPoints, index: 1 + Math.floor(Math.random() * Math.max(1, segments - 1))
+    } : null);
+
+    if (spark.branch2) {
+      const source = spark.branchPoints[Math.max(1, Math.floor(spark.branchPoints.length / 2))];
+      spark.branch2Points.length = 0;
+      spark.branch2Points.push({ x: source.x, y: source.y });
+      let x = source.x, y = source.y;
+      let heading = angle + (Math.random() - 0.5) * 2.2;
+      for (let i = 0; i < 2; i += 1) {
+        heading += (Math.random() - 0.5) * 1.1;
+        x += Math.cos(heading) * length * 0.065;
+        y += Math.sin(heading) * length * 0.065;
+        spark.branch2Points.push({ x, y });
+      }
+    }
   }
 
   function emitFromVelocity(dt) {
-    if (!state.active || state.speed < 0.2) return;
-
-    const energy = Math.min(1, Math.max(0, (state.speed - 0.2) / 2.2));
-    const rate = state.speed < NORMAL
-      ? 2 + energy * 5
-      : state.speed < FAST
-        ? 8 + energy * 13
-        : 20 + energy * 22;
-
+    if (!state.active || state.speed < 0.18) return;
+    const energy = Math.min(1, Math.max(0, (state.speed - 0.16) / 1.55));
+    const rate = state.speed < NORMAL ? 1.2 + energy * 3 : state.speed < FAST
+      ? 4 + energy * 10 : 12 + energy * 25;
     state.emissionCarry += rate * dt / 1000;
     while (state.emissionCarry >= 1) {
       emitSpark(energy);
       state.emissionCarry -= 1;
     }
-
     if (state.speed >= EXTREME && state.burstCooldown <= 0) {
-      const count = Math.min(9, 4 + Math.round(energy * 5));
-      for (let i = 0; i < count; i += 1) emitSpark(Math.min(1, energy + 0.16), true);
-      state.burstCooldown = 210;
+      const count = Math.min(8, 3 + Math.round(energy * 5));
+      for (let i = 0; i < count; i += 1) emitSpark(Math.min(1, energy + 0.15), true);
+      state.burstCooldown = 190;
     }
   }
 
@@ -172,14 +156,11 @@
     for (const spark of sparks) {
       if (!spark.active) continue;
       spark.life -= dt;
-      if (spark.life <= 0) {
-        spark.active = false;
-        continue;
-      }
+      if (spark.life <= 0) { spark.active = false; continue; }
       spark.x += spark.vx * step;
       spark.y += spark.vy * step;
-      spark.vx *= Math.pow(0.93, step);
-      spark.vy *= Math.pow(0.93, step);
+      spark.vx *= Math.pow(0.92, step);
+      spark.vy *= Math.pow(0.92, step);
     }
   }
 
@@ -187,10 +168,8 @@
     if (!points || points.length < 2) return;
     ctx.beginPath();
     ctx.moveTo(spark.x + points[0].x, spark.y + points[0].y);
-    for (let i = 1; i < points.length; i += 1) {
-      ctx.lineTo(spark.x + points[i].x, spark.y + points[i].y);
-    }
-    ctx.strokeStyle = "rgba(255, 249, 232, " + alpha.toFixed(3) + ")";
+    for (let i = 1; i < points.length; i += 1) ctx.lineTo(spark.x + points[i].x, spark.y + points[i].y);
+    ctx.strokeStyle = "rgba(255, 252, 242, " + Math.min(1, alpha).toFixed(3) + ")";
     ctx.lineWidth = width;
     ctx.stroke();
   }
@@ -204,23 +183,23 @@
     for (const spark of sparks) {
       if (!spark.active) continue;
       const ratio = Math.max(0, Math.min(1, spark.life / spark.maxLife));
-      const fade = Math.sin(ratio * Math.PI);
-      const flicker = ratio < spark.flickerAt
-        ? 0.55 + Math.random() * spark.flickerStrength
-        : 1;
+      const fade = ratio < 0.16 ? ratio / 0.16 : Math.min(1, (1 - ratio) * 7) * 0.8 + 0.2;
+      const flicker = ratio < spark.flickerAt && Math.random() < 0.34
+        ? 0.35 + Math.random() * spark.flickerStrength : 1;
       const alpha = spark.opacity * fade * flicker;
 
-      // A restrained glow under a much sharper electrical core.
+      // Broad atmospheric aura first; the crisp core is deliberately dominant.
       ctx.shadowBlur = spark.glow;
-      ctx.shadowColor = "rgba(230, 210, 166, " + (alpha * 0.32).toFixed(3) + ")";
-      drawPath(spark.points, spark, alpha * 0.32, spark.width + 1.2);
-
+      ctx.shadowColor = "rgba(205, 220, 255, " + (alpha * 0.28).toFixed(3) + ")";
+      drawPath(spark.points, spark, alpha * 0.26, spark.width + 1.35);
       ctx.shadowBlur = 0;
-      drawPath(spark.points, spark, alpha, spark.width);
 
-      if (spark.branch) {
-        drawPath(spark.branchPoints, spark, alpha * 0.68, Math.max(0.45, spark.width * 0.72));
-      }
+      drawPath(spark.points, spark, alpha, spark.width);
+      // A tiny bright filament makes the discharge read as electricity, not a neon tube.
+      drawPath(spark.points, spark, Math.min(1, alpha * 0.72), Math.max(0.42, spark.width * 0.48));
+
+      if (spark.branch) drawPath(spark.branchPoints, spark, alpha * 0.78, Math.max(0.42, spark.width * 0.68));
+      if (spark.branch2) drawPath(spark.branch2Points, spark, alpha * 0.58, Math.max(0.4, spark.width * 0.55));
     }
 
     ctx.shadowBlur = 0;
@@ -231,18 +210,14 @@
   function frame(now) {
     state.raf = 0;
     if (!state.visible) return;
-
     const dt = Math.min(34, Math.max(8, now - state.lastFrame));
     state.lastFrame = now;
-
-    state.speed += (state.targetSpeed - state.speed) * 0.17;
-    state.targetSpeed *= Math.pow(0.58, dt / 16.67);
+    state.speed += (state.targetSpeed - state.speed) * 0.2;
+    state.targetSpeed *= Math.pow(0.54, dt / 16.67);
     state.burstCooldown = Math.max(0, state.burstCooldown - dt);
-
     emitFromVelocity(dt);
     updateSparks(dt);
     render();
-
     const alive = sparks.some(spark => spark.active);
     const moving = state.active && now - state.lastMove < 90;
     if (alive || moving || state.speed > 0.025) state.raf = requestAnimationFrame(frame);
@@ -256,7 +231,6 @@
 
   function onPointerMove(event) {
     if (event.pointerType && event.pointerType !== "mouse") return;
-
     const now = performance.now();
     if (!state.active) {
       resetPointer(event.clientX, event.clientY);
@@ -264,18 +238,15 @@
       state.lastMove = now;
       return;
     }
-
     const elapsed = Math.max(8, now - state.lastMove);
     const dx = event.clientX - state.previousX;
     const dy = event.clientY - state.previousY;
     const distance = Math.hypot(dx, dy);
     const rawSpeed = Math.min(3.5, distance / elapsed);
-
     if (distance > 0) {
       state.directionX = dx / distance;
       state.directionY = dy / distance;
     }
-
     state.targetSpeed = rawSpeed;
     state.x = event.clientX;
     state.y = event.clientY;
@@ -308,9 +279,7 @@
   resize();
   addEventListener("resize", resize, { passive: true });
   document.addEventListener("pointermove", onPointerMove, { passive: true });
-  addEventListener("mouseout", event => {
-    if (!event.relatedTarget) stopPointer();
-  }, { passive: true });
+  addEventListener("mouseout", event => { if (!event.relatedTarget) stopPointer(); }, { passive: true });
   addEventListener("blur", stopPointer, { passive: true });
   document.addEventListener("visibilitychange", onVisibilityChange);
 })();
