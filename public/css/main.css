@@ -1925,25 +1925,6 @@ body::after{
   [data-infinite-project-rail]{transform:none!important}
 }
 
-/* ---------- global velocity sparks ---------- */
-.velocity-sparks{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  z-index:9999;
-  display:block;
-  pointer-events:none;
-  overflow:hidden;
-}
-@media (hover:none),(pointer:coarse){
-  .velocity-sparks{display:none!important}
-}
-@media (prefers-reduced-motion:reduce){
-  .velocity-sparks{display:none!important}
-}
-
-
 /* How I Build — editorial right column */
 .build-intro{padding-bottom:28px;border-bottom:1px solid var(--line)}
 .build-label{display:block;margin-bottom:18px;color:var(--accent-2);font:700 .58rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em}
