@@ -435,8 +435,7 @@
       const firstLeft = first.getBoundingClientRect().left;
       const secondLeft = second.getBoundingClientRect().left;
       const firstSetWidth =
-        originalCards.reduce((sum, card) => sum + card.getBoundingClientRect().width, 0) +
-        (secondLeft - firstLeft - first.getBoundingClientRect().width);
+        originalCards[originalCount - 1].getBoundingClientRect().right - firstLeft;
 
       const viewportWidth =
         projectRail.parentElement?.getBoundingClientRect().width || window.innerWidth;
