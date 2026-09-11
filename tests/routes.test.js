@@ -123,7 +123,7 @@ const sparksJs = fs.readFileSync(path.join(root, "public/js/velocity-sparks.js")
 assert.match(sparksJs, /requestAnimationFrame/);
 assert.match(sparksJs, /prefers-reduced-motion/);
 assert.match(sparksJs, /devicePixelRatio/);
-assert.match(sparksJs, /MAX_PARTICLES = 120/);
+assert.match(sparksJs, /MAX_ARCS = 72/);\nassert.match(sparksJs, /generateLightning/);\nassert.match(sparksJs, /branch2/);\nassert.match(sparksJs, /strokeLightning/);
 assert.match(sparksJs, /distance \/ elapsed/);
 assert.match(sparksJs, /pointermove/);
 
