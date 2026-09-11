@@ -9,36 +9,113 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+        }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/projects", "destination": "/projects/index.html" },
-    { "source": "/labs", "destination": "/labs/index.html" },
-    { "source": "/tools", "destination": "/tools/index.html" },
-    { "source": "/stack", "destination": "/stack/index.html" },
-    { "source": "/blog", "destination": "/blog/index.html" },
-    { "source": "/about", "destination": "/about/index.html" },
-    { "source": "/contact", "destination": "/contact/index.html" },
-    { "source": "/stats", "destination": "/stats/index.html" },
-    { "source": "/projects/anshika-studio", "destination": "/projects/anshika-studio.html" },
-    { "source": "/projects/previous-portfolio", "destination": "/projects/previous-portfolio.html" },
-    { "source": "/projects/sih-2026", "destination": "/projects/sih-2026.html" },
-    { "source": "/labs/liquid-interaction", "destination": "/labs/liquid-interaction/index.html" },
-    { "source": "/labs/magnetic-ui", "destination": "/labs/magnetic-ui/index.html" },
-    { "source": "/labs/scroll-playground", "destination": "/labs/scroll-playground/index.html" },
-    { "source": "/labs/velocity-sparks", "destination": "/labs/velocity-sparks/index.html" },
-    { "source": "/tools/json", "destination": "/tools/json/index.html" },
-    { "source": "/tools/image-optimizer", "destination": "/tools/image-optimizer/index.html" },
-    { "source": "/tools/gradient-generator", "destination": "/tools/gradient-generator/index.html" },
-    { "source": "/tools/file-converter", "destination": "/tools/file-converter/index.html" },
-    { "source": "/todo", "destination": "/todo-app/index.html" },
-    { "source": "/archive/previous-portfolio", "destination": "/archive/previous-portfolio/index.html" }
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/projects",
+      "destination": "/projects/index.html"
+    },
+    {
+      "source": "/labs",
+      "destination": "/labs/index.html"
+    },
+    {
+      "source": "/tools",
+      "destination": "/tools/index.html"
+    },
+    {
+      "source": "/stack",
+      "destination": "/stack/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about/index.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact/index.html"
+    },
+    {
+      "source": "/stats",
+      "destination": "/stats/index.html"
+    },
+    {
+      "source": "/projects/anshika-studio",
+      "destination": "/projects/anshika-studio.html"
+    },
+    {
+      "source": "/projects/previous-portfolio",
+      "destination": "/projects/previous-portfolio.html"
+    },
+    {
+      "source": "/projects/sih-2026",
+      "destination": "/projects/sih-2026.html"
+    },
+    {
+      "source": "/labs/liquid-interaction",
+      "destination": "/labs/liquid-interaction/index.html"
+    },
+    {
+      "source": "/labs/magnetic-ui",
+      "destination": "/labs/magnetic-ui/index.html"
+    },
+    {
+      "source": "/labs/scroll-playground",
+      "destination": "/labs/scroll-playground/index.html"
+    },
+    {
+      "source": "/tools/json",
+      "destination": "/tools/json/index.html"
+    },
+    {
+      "source": "/tools/image-optimizer",
+      "destination": "/tools/image-optimizer/index.html"
+    },
+    {
+      "source": "/tools/gradient-generator",
+      "destination": "/tools/gradient-generator/index.html"
+    },
+    {
+      "source": "/tools/file-converter",
+      "destination": "/tools/file-converter/index.html"
+    },
+    {
+      "source": "/todo",
+      "destination": "/todo-app/index.html"
+    },
+    {
+      "source": "/archive/previous-portfolio",
+      "destination": "/archive/previous-portfolio/index.html"
+    }
   ]
 }
