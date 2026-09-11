@@ -410,71 +410,65 @@
   if (projectRail && !reduceMotion && projectRail.children.length > 1) {
     const originalCards = Array.from(projectRail.children);
     const originalCount = originalCards.length;
-    let loopWidth = 0;
-    let offset = 0;
-    let lastTime = performance.now();
-    let railFrame = 0;
     let resizeFrame = 0;
-    let cloneSets = [];
-    const speed = 34;
 
     const clearClones = () => {
-      cloneSets.forEach(set => set.forEach(card => card.remove()));
-      cloneSets = [];
+      projectRail.querySelectorAll("[data-project-rail-clone]").forEach(card => card.remove());
     };
 
     const markCloneAccessible = card => {
+      card.setAttribute("data-project-rail-clone", "true");
       card.setAttribute("aria-hidden", "true");
       card.querySelectorAll("a,button,input,textarea,select,[tabindex]").forEach(control => {
         control.setAttribute("tabindex", "-1");
+        control.setAttribute("aria-hidden", "true");
       });
       card.classList.remove("js-reveal", "is-visible");
       return card;
     };
 
-    const buildTrack = () => {
+    const measureTrack = () => {
       clearClones();
 
-      /* Keep enough complete sequences in the track that the viewport can
-         never reach the end before an identical sequence is already present. */
-      const firstWidth = originalCards.reduce(
-        (sum, card) => sum + card.getBoundingClientRect().width,
-        0
-      );
-      const gapValue = getComputedStyle(projectRail).columnGap ||
-        getComputedStyle(projectRail).gap || "0px";
-      const gap = parseFloat(gapValue) || 0;
-      const sequenceWidth =
-        firstWidth + gap * Math.max(0, originalCount - 1);
+      const first = originalCards[0];
+      const second = originalCards[1];
+      const firstLeft = first.getBoundingClientRect().left;
+      const secondLeft = second.getBoundingClientRect().left;
+      const firstSetWidth =
+        originalCards.reduce((sum, card) => sum + card.getBoundingClientRect().width, 0) +
+        (secondLeft - firstLeft - first.getBoundingClientRect().width);
+
       const viewportWidth =
-        projectRail.parentElement?.getBoundingClientRect().width ||
-        window.innerWidth;
+        projectRail.parentElement?.getBoundingClientRect().width || window.innerWidth;
+
+      /* Build enough complete copies that the viewport is covered even when
+         the first set is wider than the viewport. The animation only ever
+         travels one complete set width. */
       const setsNeeded = Math.max(
         2,
-        Math.ceil((viewportWidth + sequenceWidth) / Math.max(1, sequenceWidth)) + 1
+        Math.ceil(viewportWidth / Math.max(1, firstSetWidth)) + 2
       );
 
       for (let setIndex = 1; setIndex < setsNeeded; setIndex += 1) {
-        const set = originalCards.map(card =>
-          markCloneAccessible(card.cloneNode(true))
-        );
-        set.forEach(card => projectRail.appendChild(card));
-        cloneSets.push(set);
+        originalCards.forEach(card => {
+          projectRail.appendChild(markCloneAccessible(card.cloneNode(true)));
+        });
       }
 
-      /* The real flex position of the first card in sequence 2 gives the
-         exact recycle distance, including the inter-sequence gap. */
-      if (projectRail.children[originalCount]) {
-        const first = originalCards[0].getBoundingClientRect();
-        const secondSetFirst =
-          projectRail.children[originalCount].getBoundingClientRect();
-        loopWidth = secondSetFirst.left - first.left;
-      } else {
-        loopWidth = sequenceWidth + gap;
-      }
+      const firstClone = projectRail.querySelector("[data-project-rail-clone]");
+      const loopWidth = firstClone
+        ? firstClone.getBoundingClientRect().left - firstLeft
+        : firstSetWidth;
 
       if (loopWidth > 0) {
-        offset = -(((-offset % loopWidth) + loopWidth) % loopWidth);
+        projectRail.style.setProperty("--project-loop-width", `${loopWidth}px`);
+        projectRail.style.setProperty(
+          "--project-loop-duration",
+          `${Math.max(16, loopWidth / 34)}s`
+        );
+        projectRail.style.animation = "none";
+        void projectRail.offsetWidth;
+        projectRail.style.animation = "projectRailLoop var(--project-loop-duration) linear infinite";
       }
     };
 
@@ -482,25 +476,11 @@
       if (resizeFrame) return;
       resizeFrame = requestAnimationFrame(() => {
         resizeFrame = 0;
-        buildTrack();
+        measureTrack();
       });
     };
 
-    const tick = now => {
-      const dt = Math.min(50, Math.max(0, now - lastTime));
-      lastTime = now;
-
-      if (loopWidth > 0) {
-        offset -= speed * (dt / 1000);
-        if (offset <= -loopWidth) offset += loopWidth;
-        projectRail.style.transform =
-          `translate3d(${offset.toFixed(2)}px,0,0)`;
-      }
-
-      railFrame = requestAnimationFrame(tick);
-    };
-
-    buildTrack();
+    measureTrack();
 
     const resizeObserver =
       "ResizeObserver" in window ? new ResizeObserver(scheduleMeasure) : null;
@@ -509,20 +489,9 @@
     }
     window.addEventListener("resize", scheduleMeasure, { passive: true });
 
-    const visibilityHandler = () => {
-      if (document.hidden) {
-        if (railFrame) cancelAnimationFrame(railFrame);
-        railFrame = 0;
-      } else if (!railFrame) {
-        lastTime = performance.now();
-        railFrame = requestAnimationFrame(tick);
-      }
-    };
-    document.addEventListener("visibilitychange", visibilityHandler, {
-      passive: true
-    });
-
-    railFrame = requestAnimationFrame(tick);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(scheduleMeasure);
+    }
   }  
   /* ---------- desktop cursor with context-aware states ---------- */
   if (!reduceMotion && finePointer) {
