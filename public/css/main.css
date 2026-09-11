@@ -1942,3 +1942,19 @@ body::after{
 @media (prefers-reduced-motion:reduce){
   .velocity-sparks{display:none!important}
 }
+
+
+/* How I Build — editorial right column */
+.build-intro{padding-bottom:28px;border-bottom:1px solid var(--line)}
+.build-label{display:block;margin-bottom:18px;color:var(--accent-2);font:700 .58rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em}
+.build-intro .large-copy{max-width:650px}
+.philosophy-copy .principles{margin-top:0;border-top:0}
+.philosophy-copy .principle{grid-template-columns:44px minmax(0,1fr);align-items:start;padding:24px 0 23px}
+.philosophy-copy .principle>div{min-width:0}
+.philosophy-copy .principle strong{display:block;line-height:1.25}
+.philosophy-copy .principle small{display:block;grid-column:auto;max-width:570px;margin:8px 0 0;color:var(--faint);font-size:.76rem;line-height:1.65}
+.philosophy-copy .principle>span{padding-top:2px}
+@media (max-width:700px){
+  .build-intro{padding-bottom:24px}
+  .philosophy-copy .principle{grid-template-columns:38px minmax(0,1fr);gap:14px;padding:20px 0}
+}
